@@ -1,984 +1,468 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>音乐播放器 - 支持LRC歌词</title>
+    <title>学生就业信息管理系统</title>
     <style>
-        .image-container {
-            margin: 30px 30px;
-        }
-         
-        .thumbnail {
-            cursor: pointer;
-            opacity: 0.7;
-            transition: 0.3s;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { padding: 20px; font-family: "Microsoft YaHei", sans-serif; }
+        h1 { text-align: center; margin-bottom: 20px; }
+        /* 登录注册窗口样式 */
+        .auth-modal { display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 100; }
+        .auth-content { background: #fff; padding: 30px; border-radius: 8px; width: 400px; }
+        .auth-tabs { display: flex; margin-bottom: 20px; border-bottom: 1px solid #ddd; }
+        .auth-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; font-weight: bold; }
+        .auth-tab.active { color: #4CAF50; border-bottom: 2px solid #4CAF50; }
+        .auth-form { display: none; }
+        .auth-form.active { display: block; }
+        .auth-form div { margin-bottom: 15px; }
+        .auth-form label { display: block; margin-bottom: 5px; }
+        .auth-form input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        .auth-btn { width: 100%; padding: 10px; border: none; border-radius: 4px; background: #4CAF50; color: #fff; cursor: pointer; font-size: 16px; }
+        .auth-btn:hover { background: #45a049; }
+        .tip { color: red; font-size: 14px; margin-top: 5px; }
 
-        #thumbnail-wen{
-            width: 200px;
-            height: 100px;
-            position: absolute;
-            top: 0px;
-            left: 175px;
-        }
-         
-        .thumbnail:hover {
-            opacity: 1;
-        }
-         
-        #displayed-image {
-            position: absolute;
-            top: 65px;
-            left: 213px;
-            margin: 10px;
-            border: 2px solid black;
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            animation: run 10s linear infinite;
-            animation-play-state: paused;
-        }
-
-        @keyframes run {
-            from{ transform: rotate(0deg); }
-            to{ transform: rotate(360deg); }
-        }
-
-        .playlist {
-            display: none; /* 默认隐藏播放列表 */
-        }
-        
-        .dahe{
-            width: 840px;
-            height: 600px;
-            background-color: rgba(100, 131, 131, 0.623);
-        }
-        
-        .xiaohhe{
-            width: 330px;
-            height: 480px;
-            background-color: rgba(79, 113, 116, 0.007);
-            position: relative;
-            left: 500px;
-            top: 30px;
-            overflow: auto;
-        }
-        
-        .xiaohhe::-webkit-scrollbar{
-            width: 5px;
-            background-color:  rgb(169, 190, 190);
-        }
-
-        .playlist ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            width: 300px;
-            height: 600px;
-            background-color: rgb(169, 190, 190);
-            position: absolute;
-            left: 830px;
-            top: 8px
-        }
-        
-        /* 播放列表项样式 */
-        .playlist li {
-            padding: 8px;
-            cursor: pointer;
-            margin-top: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: background-color 0.3s;
-        }
-        
-        .playlist li:hover {
-            background-color: #f2f2f2;
-        }
-        
-        /* 歌曲图片样式 */
-        .song-cover {
-            width: 40px;
-            height: 40px;
-            border-radius: 4px;
-            object-fit: cover;
-        }
-        
-        /* 歌曲信息容器 */
-        .song-info {
-            flex: 1;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        /* 歌曲名称样式 */
-        .song-title {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 180px;
-        }
-        
-        /* 歌曲时长样式 */
-        .song-duration {
-            color: #666;
-            font-size: 12px;
-            margin-left: 10px;
-        }
-
-        .shang{
-            width: 60px;
-            height: 23px;
-        }
-        
-        .xia{
-            width: 60px;
-            height: 23px;
-        }
-
-        ul { 
-            list-style: none; 
-            margin: 10px; 
-            padding: 3px;
-        }
-        
-        li { 
-            padding: 8px;
-            cursor: pointer; 
-        }
-        
-        li.playing {
-            background-color: #3fda6159;   
-        }
-
-        .wen1,.wen2,.wen3,.wen4,.wen5,.wen6,.wen7,.wen8,.wen9,.wen10,.wen11,.wen12 {
-            width: 78px;
-            height: 12px;
-            margin: 4px 10px;
-            float: left;
-            font-size: 11px;
-        }
-
-        .xiam{
-            width: 502px;
-            height: 142px;
-            background-color: rgba(141, 175, 171, 0.199);
-            position: absolute;
-            top: 400px;
-            left: 3px;
-        }
-        
-        .shengy{
-            width: 80px;
-            height: 3px;
-            background-color: rgb(110, 24, 24);
-            position: absolute;
-            top: 620px;
-            left: -263px;
-        }
-        
-        .speed{
-            width: 50px;
-            height: 20px;
-            position: absolute;
-            top: 12px;
-            left: 360px;
-        }
-
-        /*播放进度*/
-        #progrees{
-            width:430px; 
-            height:5px; 
-            background:#ccc; 
-            margin:0 auto;
-            position: relative;
-            top:-20px;
-            left: 10px;
-            cursor: pointer;
-        }
-
-        #curProgrees{
-            width:0%;
-            height:100%;
-            background:rgba(173, 172, 156, 0.801);
-        }
-        
-        /*播放时间*/
-        #playTime{
-            padding:10px 25px 0px;
-            text-align: right;
-            position: absolute;
-            top: -70px;
-            right: 10px;
-            font-size: 16px;
-        }
-        
-        .musicName{
-            width: 400px;
-            height: 60px;
-            position: absolute;
-            top: 380px;
-            left: 60px;
-            font-size: 20px;
-            text-align: center;
-        }
-        
-        .zhuanji{
-            width: 400px;
-            height: 60px;
-            position: absolute;
-            top: -100px;
-            left:59px;
-            font-size: 20px;
-            text-align: center;
-            font-weight: bold;
-            color: #518317;
-        }
-        
-        .zhj{
-            width: 400px;
-            height: 60px;
-            position: absolute;
-            top: 440px;
-            left: 60px;
-            font-size: 20px;
-            text-align: center;
-            line-height: 83px;
-        }
-
-        .kzhi{
-            width: 300px;
-            height: 20px;
-            position: absolute;
-            top: 490px;
-            left: 40px;
-        }
-
-        #container {
-            display: flex;
-            width: 100px;
-            height: 100px;
-        }
-         
-        #content {
-            display: none;
-        }
-         
-        .content-item {
-            display: none;
-            width: 200px;
-            height: 30px;
-            background-color: #94e78c6c;
-        }
-
-        #text-container {
-            width: 200px;
-            height: 100px;
-            position: absolute;
-            top: 0px;
-            left: 175px;
-        }
-         
-        .clickable-image {
-            width: 100px;
-            height: 100px;
-            cursor: pointer;
-        }
-
-        progress, input[type="range"] {
-            width: 100%;
-        }
-
-        /*进度条滑块*/
-        .audio-player {
-            position: relative;
-            width: 302px;
-        }
-         
-        .progress-bar {
-            width: 440px;
-            height: 5px;
-            background-color: #ddd;
-            position: relative;
-            cursor: pointer;
-            top: -138px;
-            left: 2pc;
-        }
-         
-        .play-head {
-            position: absolute;
-            height: 10px;
-            width: 10px;
-            background-color: #333;
-            border-radius: 50%;
-            top: -2px;
-            cursor: pointer;
-        }
-         
-        .time-indicator {
-            position: absolute;
-            height: 5px;
-            background-color: #777;
-        }  
-
-        /* 歌词容器 */
-        .lyrics-container {
-            height: 150px;
-            width: 400px;
-            overflow: hidden;
-            margin: 15px 0;
-            padding: 10px;
-            border-radius: 5px;
-            position: absolute;
-            top: 190px;
-            left: 46px;
-            text-align: center;
-        }
-
-        .lyric-line {
-            padding: 5px 0;
-            transition: all 0.3s;
-            color: #333;
-        }
-
-        .lyric-line.active {
-            color: #d93548;
-            font-weight: bold;
-            transform: scale(1.05);
-        }
-
-        /* 加载提示 */
-        .loading-lyrics {
-            color: #666;
-            font-style: italic;
-        }
+        /* 原有样式保留 */
+        .btn-group { margin: 10px 0; display: flex; gap: 10px; align-items: center; }
+        .add, .export, .search-btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; color: #fff; }
+        .add { background: #4CAF50; }
+        .export { background: #2196F3; }
+        .search-btn { background: #ff9800; }
+        .search-input, .sort-select { padding: 6px; border: 1px solid #ccc; border-radius: 4px; }
+        .search-input { width: 200px; }
+        .info { background: cadetblue; padding: 15px; margin: 10px 0; display: flex; flex-wrap: wrap; gap: 15px; border-radius: 4px; }
+        .title { height: 50px; background: antiquewhite; display: flex; align-items: center; justify-content: center; margin: 10px 0; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; border: 1px solid #ddd; text-align: center; }
+        th { background: #f0e6d6; cursor: pointer; }
+        .operation a { margin: 0 5px; text-decoration: none; color: #d9534f; }
+        .operation a.edit { color: #28a745; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+        .modal-content { background: #fff; padding: 20px; border-radius: 6px; width: 500px; }
+        .modal-header { display: flex; justify-content: space-between; margin-bottom: 15px; }
+        .close-btn { background: none; border: none; font-size: 20px; cursor: pointer; }
+        .modal-footer { margin-top: 15px; text-align: right; }
+        .submit-btn, .cancel-btn { padding: 5px 10px; margin-left: 10px; border: none; border-radius: 4px; cursor: pointer; }
+        .submit-btn { background: burlywood; }
+        .cancel-btn { background: #ccc; }
+        /* 未登录时隐藏操作区 */
+        .operation-area { display: none; }
     </style>
 </head>
 <body>
-    <div class="dahe">
-        <div class="zhj" id="text-container">音乐专辑</div>
-        <h2 class="musicName">歌曲名称</h2>
-        <div class="xiaohhe" id="xiaohhe">
-            <!-- 图片列表 -->
-            <img src="安静.jpg" class="thumbnail" data-text="个人成长金曲" data-playlist="playlist1" 
-                 style="width: 100px ;height: 100px;" alt="个人成长金曲专辑封面">
-            <img src="咖啡1.jpg" class="thumbnail" data-text="去有风的地方" data-playlist="playlist2" 
-                 style="width: 100px ;height: 100px;" alt="去有风的地方专辑封面" class="thumbnail">
-            <img src="陈慧琳.jpg" class="thumbnail" data-text="一路有你" data-playlist="playlist3" 
-                 style="width: 100px ;height: 100px;" alt="一路有你专辑封面" class="thumbnail">
-            <div class="wen1">个人成长金曲</div>
-            <div class="wen2">去有风的地方</div>
-            <div class="wen3">一路有你</div>
-            
-            <img src="雷.jpg" class="thumbnail" data-text="路过人家" data-playlist="playlist1" 
-                 style="width: 100px ;height: 100px;" alt="路过人家专辑封面" class="thumbnail">
-            <img src="米.jpg" class="thumbnail" data-text="青花" data-playlist="playlist2" 
-                 style="width: 100px ;height: 100px;" alt="青花专辑封面" class="thumbnail">
-            <img src="林.jpg" class="thumbnail" data-text="穿过山海只为你" 
-                 style="width: 100px ;height: 100px;" alt="穿过山海只为你专辑封面" class="thumbnail">
-            <div class="wen4">路过人家</div>
-            <div class="wen5">青花</div>
-            <div class="wen6">穿过山海只为你</div>
+    <h1>学生就业信息管理系统</h1>
 
-            <img src="雪.png" class="thumbnail" data-text="千里之外爱着你" data-playlist="playlist1" 
-                 style="width: 100px ;height: 100px;" alt="千里之外爱着你专辑封面" class="thumbnail">
-            <img src="夜曲.png" class="thumbnail" data-text="咏不失联的爱" data-playlist="playlist2" 
-                 style="width: 100px ;height: 100px;" alt="咏不失联的爱专辑封面" class="thumbnail">
-            <img src="贞.jpg" class="thumbnail" data-text="一路生花" 
-                 style="width: 100px ;height: 100px;" alt="一路生花专辑封面" class="thumbnail">
-            <div class="wen7">千里之外爱着你</div>
-            <div class="wen8">咏不失联的爱</div>
-            <div class="wen9">一路生花</div>
-       
-           <img src="珠落玉盘.png" class="thumbnail" data-text="如果爱忘了" data-playlist="playlist1" 
-                 style="width: 100px ;height: 100px;" alt="如果爱忘了专辑封面" class="thumbnail">
-           <img src="本草纲目.jpg" class="thumbnail" data-text="街角的祝福" data-playlist="playlist2" 
-                 style="width: 100px ;height: 100px;" alt="街角的祝福专辑封面" class="thumbnail">
-           <img src="唱.jpg" class="thumbnail" data-text="我想你懂" 
-                 style="width: 100px ;height: 100px;" alt="我想你懂专辑封面" class="thumbnail">
-           <div class="wen10">如果爱忘了</div>
-           <div class="wen11">街角的祝福</div>
-           <div class="wen12">我想你懂</div>
-
-           <img src="唱响音乐.jpg" data-playlist="playlist1" 
-                 style="width: 100px ;height: 100px;" alt="唱响音乐专辑封面" class="thumbnail">
-           <img src="黄秋宁.png" data-playlist="playlist2" 
-                 style="width: 100px ;height: 100px;" alt="黄秋宁专辑封面" class="thumbnail">
-           <img src="乡村音乐.jpg" style="width: 100px ;height: 100px;" alt="乡村音乐专辑封面" class="thumbnail">
-           <div class="wen10">如果爱忘了</div>
-           <div class="wen11">街角的祝福</div>
-           <div class="wen12">我想你懂</div>
-            
-            <button onclick="togglePlay()">播放/暂停</button>
-            <button class="close-button">关闭列表</button>
-        </div>
-    </div>
-
-    <div id="playlist-container">
-        <!-- 播放列表1 -->
-        <div id="playlist1" class="playlist">
-            <ul>
-                <li data-song="牛奶咖啡 - 明天，你好 (3D环绕版).mp3" 
-                    lrcSrc="明天你好.lrc" 
-                    data-cover="安静.jpg" 
-                    data-text="牛奶咖啡 - 明天，你好" 
-                    data-duration="04:29">
-                    <img class="song-cover" src="安静.jpg" alt="明天你好专辑封面">
-                    <div class="song-info">
-                        <span class="song-title">牛奶咖啡 - 明天，你好</span>
-                        <span class="song-duration">04:29</span>
-                    </div>
-                </li>
-                <li data-song="郭静 - 心墙 (3D环绕版).mp3" 
-                    lrcSrc="心墙.lrc" 
-                    data-cover="感官先生.jpg" 
-                    data-text="郭静 - 心墙"
-                    data-duration="03:45">
-                    <img class="song-cover" src="感官先生.jpg" alt="心墙专辑封面">
-                    <div class="song-info">
-                        <span class="song-title">郭静 - 心墙</span>
-                        <span class="song-duration">03:45</span>
-                    </div>
-                </li>
-                <li data-song="陈慧琳 - 记事本 (3D环绕版).mp3" 
-                    lrcSrc="记事本.lrc" 
-                    data-cover="林.jpg" 
-                    data-text="陈慧琳 - 记事本"
-                    data-duration="04:12">
-                    <img class="song-cover" src="林.jpg" alt="记事本专辑封面">
-                    <div class="song-info">
-                        <span class="song-title">陈慧琳 - 记事本</span>
-                        <span class="song-duration">04:12</span>
-                    </div>
-                </li>
-            </ul>
-        </div>
-        
-        <!-- 播放列表2 -->
-        <div id="playlist2" class="playlist">
-            <ul>
-                <li data-song="陈百强 - 一生何求.mp3" 
-                    lrcSrc="一生中所求.lrc" 
-                    data-cover="咖啡1.jpg" 
-                    data-text="陈百强 - 一生何求"
-                    data-duration="04:38">
-                    <img class="song-cover" src="咖啡1.jpg" alt="一生何求专辑封面">
-                    <div class="song-info">
-                        <span class="song-title">陈百强 - 一生何求</span>
-                        <span class="song-duration">04:38</span>
-                    </div>
-                </li>
-                <li data-song="谭咏麟 - 一生中最爱 (3D环绕版).mp3" 
-                    lrcSrc="一生中最爱1.lrc" 
-                    data-cover="看.jpg" 
-                    data-text="谭咏麟 - 一生中最爱"
-                    data-duration="04:16">
-                    <img class="song-cover" src="看.jpg" alt="一生中最爱专辑封面">
-                    <div class="song-info">
-                        <span class="song-title">谭咏麟 - 一生中最爱</span>
-                        <span class="song-duration">04:16</span>
-                    </div>
-                </li>
-            </ul>
-        </div>
-        
-        <!-- 播放列表3 -->
-        <div id="playlist3" class="playlist">
-            <ul>
-                <li data-song="雷婷 - 甘心情愿 (3D环绕版).mp3" 
-                    lrcSrc="甘心情愿.lrc" 
-                    data-cover="雷.jpg" 
-                    data-text="雷婷 - 甘心情愿"
-                    data-duration="04:52">
-                    <img class="song-cover" src="雷.jpg" alt="甘心情愿专辑封面">
-                    <div class="song-info">
-                        <span class="song-title">雷婷 - 甘心情愿</span>
-                        <span class="song-duration">04:52</span>
-                    </div>
-                </li>
-                <li data-song="郭静 - 心墙 (3D环绕版).mp3" 
-                    lrcSrc="心墙.lrc" 
-                    data-cover="米.jpg" 
-                    data-text="郭静 - 心墙"
-                    data-duration="03:45">
-                    <img class="song-cover" src="米.jpg" alt="心墙专辑封面">
-                    <div class="song-info">
-                        <span class="song-title">郭静 - 心墙</span>
-                        <span class="song-duration">03:45</span>
-                    </div>
-                </li>
-            </ul>
-        </div>
-
-        <div class="xiam"></div>
-        <div class="kzhi">
-            <!--播放时间-->
-            <div id="playTime">
-                <span id="presentTime">00 : 00</span>
-                <span>/</span>
-                <span id="totalTime">00 : 00</span>
+    <!-- 登录/注册窗口（默认显示） -->
+    <div class="auth-modal" id="authModal">
+        <div class="auth-content">
+            <div class="auth-tabs">
+                <div class="auth-tab active" data-tab="login">登录</div>
+                <div class="auth-tab" data-tab="register">注册</div>
             </div>
-            <!--播放进度-->
-            <div id="progrees">
-                <div id="curProgrees"></div>
-            </div>
-            
-            <img src="导航管理.png" style="width: 30px; height: 30px; margin: 5px 5px; cursor: pointer;" id="music" alt="音乐库">
-            <img src="上一首 .png" style="width: 30px; height: 30px; margin: 5px 5px; cursor: pointer;" id="previous" alt="上一首">
-            <img src="播放.png" style="width: 30px; height: 30px;margin: 5px 5px; cursor: pointer;" id="play" alt="播放">
-            <img src="暂停.png" style="width: 30px; height: 30px;margin: 5px 5px; cursor: pointer;" id="pause" alt="暂停">
-            <img src="下一首.png" style="width: 30px; height: 30px; margin: 5px 5px; cursor: pointer;" id="next" alt="下一首">
-            <img src="声音.png" style="width: 30px; height: 30px; margin: 5px 5px; cursor: pointer;" id="volume-icon" alt="音量控制">
-            
-            <input type="range" min="0" value="80" max="100" id="range" class="pro" style="position: absolute; top: 14px; left: 260px; width: 80px;"/>
-            <div id="speed" class="speed">1.0X</div>
-            <img src="cd.png" style="width: 25px; height: 25px; margin: 5px 5px; position: absolute; top: 6px; left: 400px; cursor: pointer;" id="cd" alt="播放列表">
+            <!-- 登录表单 -->
+            <form class="auth-form active" id="loginForm">
+                <div>
+                    <label>用户名</label>
+                    <input type="text" id="loginUsername" required placeholder="请输入用户名">
+                </div>
+                <div>
+                    <label>密码</label>
+                    <input type="password" id="loginPassword" required placeholder="请输入密码">
+                    <div class="tip" id="loginTip"></div>
+                </div>
+                <button type="submit" class="auth-btn">登录</button>
+            </form>
+            <!-- 注册表单 -->
+            <form class="auth-form" id="registerForm">
+                <div>
+                    <label>用户名</label>
+                    <input type="text" id="regUsername" required placeholder="请设置用户名">
+                </div>
+                <div>
+                    <label>密码</label>
+                    <input type="password" id="regPassword" required placeholder="请设置密码（≥6位）">
+                </div>
+                <div>
+                    <label>确认密码</label>
+                    <input type="password" id="regConfirmPwd" required placeholder="请再次输入密码">
+                    <div class="tip" id="regTip"></div>
+                </div>
+                <button type="submit" class="auth-btn">注册</button>
+            </form>
         </div>
     </div>
 
-    <img id="displayed-image" class="displayed-image"  src="安静.jpg" alt="当前播放歌曲封面">
-    <div class="progress-bar">
-        <div class="play-head"></div>
-        <div class="time-indicator"></div>
-    </div>
-    <div class="lyrics-container" id="lyrics-display">
-        <div class="lyric-line"></div>
-    </div>
+    <!-- 操作区（未登录时隐藏） -->
+    <div class="operation-area" id="operationArea">
+        <!-- 功能区 -->
+        <div class="btn-group">
+            <button class="add">增加数据</button>
+            <button class="export">导出数据</button>
+            <input type="text" class="search-input" placeholder="搜索姓名/院校/城市">
+            <button class="search-btn">搜索</button>
+            <select class="sort-select">
+                <option value="default">默认排序</option>
+                <option value="salary-asc">薪资升序</option>
+                <option value="salary-desc">薪资降序</option>
+                <option value="age-asc">年龄升序</option>
+                <option value="age-desc">年龄降序</option>
+            </select>
+            <button class="logout-btn" style="margin-left: auto; background: #d9534f;">退出登录</button>
+        </div>
 
-    <audio id="myAudio">
-        <source src="" type="audio/mpeg">
-        您的浏览器不支持音频播放
-    </audio>
+        <!-- 新增表单 -->
+        <form class="info">
+            姓名: <input type="text" class="uname" required>
+            性别: <select class="gender" required>
+                <option value="" disabled selected>请选择</option>
+                <option value="男">男</option>
+                <option value="女">女</option>
+            </select>
+            年龄: <input type="number" class="age" min="18" required>
+            电话: <input type="tel" class="phone" required>
+            院校: <input type="text" class="yx" required>
+            城市: <select class="city" required>
+                <option value="" disabled selected>请选择</option>
+                <option value="北京">北京</option>
+                <option value="上海">上海</option>
+                <option value="广州">广州</option>
+                <option value="深圳">深圳</option>
+            </select>
+            薪资: <input type="number" class="salary" min="0" required>
+            <button type="submit" class="submit-btn">提交</button>
+        </form>
+
+        <!-- 统计区 -->
+        <div class="title"></div>
+
+        <!-- 表格 -->
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th><th>姓名</th><th>性别</th><th>年龄</th><th>电话</th><th>院校</th><th>城市</th><th>薪资</th><th>录入时间</th><th>操作</th>
+                </tr>
+            </thead>
+            <tbody class="table-body"></tbody>
+        </table>
+
+        <!-- 编辑弹窗 -->
+        <div class="modal" id="editModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>编辑信息</h3>
+                    <button class="close-btn">&times;</button>
+                </div>
+                <form id="editForm">
+                    <input type="hidden" id="editId">
+                    姓名: <input type="text" id="editName" required><br><br>
+                    性别: <select id="editGender" required>
+                        <option value="男">男</option>
+                        <option value="女">女</option>
+                    </select><br><br>
+                    年龄: <input type="number" id="editAge" min="18" required><br><br>
+                    电话: <input type="tel" id="editPhone" required><br><br>
+                    院校: <input type="text" id="editYx" required><br><br>
+                    城市: <select id="editCity" required>
+                        <option value="北京">北京</option>
+                        <option value="上海">上海</option>
+                        <option value="广州">广州</option>
+                        <option value="深圳">深圳</option>
+                    </select><br><br>
+                    薪资: <input type="number" id="editSalary" min="0" required><br><br>
+                    <div class="modal-footer">
+                        <button type="button" class="cancel-btn">取消</button>
+                        <button type="submit" class="submit-btn">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <script>
-        // 全局变量
-        let audio = document.getElementById('myAudio');
-        let line = document.querySelector('.displayed-image');
-        let currentPlaylist = null;
-        let isPlaying = false;
-        let lyricsDisplay = document.getElementById('lyrics-display');
-        let lyricLines = [];  // 存储解析后的歌词 {time: 秒数, element: DOM元素}
-        let totalTimeEl = document.getElementById('totalTime');
-        let presentTimeEl = document.getElementById('presentTime');
-        let curProgrees = document.getElementById('curProgrees');
-        let progressBar = document.querySelector('.progress-bar');
-        let playHead = document.querySelector('.play-head');
-        let timeIndicator = document.querySelector('.time-indicator');
-        let volumeSlider = document.getElementById('range');
-        let volumeIcon = document.getElementById('volume-icon');
-        let speedDisplay = document.getElementById('speed');
-        let speed = 1.0;
-       
-        // 页面加载完成初始化
-        window.onload = function() {
-            // 初始化事件监听
-            initEventListeners();
-            
-            // 设置初始音量
-            audio.volume = volumeSlider.value / 100;
-        };
+        // ====================== 用户认证相关 ======================
+        const authModal = document.getElementById('authModal');
+        const operationArea = document.getElementById('operationArea');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const loginTip = document.getElementById('loginTip');
+        const regTip = document.getElementById('regTip');
+        const logoutBtn = document.querySelector('.logout-btn');
 
-        // 初始化所有事件监听
-        function initEventListeners() {
-            // 缩略图点击事件 - 显示播放列表
-            document.querySelectorAll('.thumbnail').forEach(thumbnail => {
-                thumbnail.addEventListener('click', function() {
-                    showPlaylist(this);
-                });
-            });
-
-            // 播放/暂停按钮事件
-            document.getElementById('play').addEventListener('click', playAudio);
-            document.getElementById('pause').addEventListener('click', pauseAudio);
-            
-            // 上一首/下一首按钮事件
-            document.getElementById('previous').addEventListener('click', playPrevious);
-            document.getElementById('next').addEventListener('click', playNext);
-            
-            // 关闭列表按钮事件
-            document.querySelector('.close-button').addEventListener('click', closeAllPlaylists);
-            
-            // CD按钮事件 - 显示当前播放列表
-            document.getElementById('cd').addEventListener('click', toggleCurrentPlaylist);
-            
-            // 音量控制事件
-            volumeSlider.addEventListener('input', setVolume);
-            volumeIcon.addEventListener('click', toggleMute);
-            
-            // 播放进度更新事件
-            audio.addEventListener('timeupdate', updateProgress);
-            
-            // 音频元数据加载完成事件 - 修复时长显示问题
-            audio.addEventListener('loadedmetadata', function() {
-                totalTimeEl.textContent = formatTime(audio.duration);
-            });
-            
-            // 进度条点击事件
-            document.getElementById('progrees').addEventListener('click', seek);
-            progressBar.addEventListener('click', seekProgressBar);
-            
-            // 播放结束事件
-            audio.addEventListener('ended', handleAudioEnded);
-            
-            // 速度控制 - 点击切换播放速度
-            speedDisplay.addEventListener('click', changePlaybackSpeed);
-            
-            // 播放列表中的歌曲点击事件
-            document.querySelectorAll('.playlist li').forEach(song => {
-                song.addEventListener('click', function() {
-                    playSelectedSong(this);
-                });
-            });
-        }
-
-        // 播放音频
-        function playAudio() {
-            if (audio.src) {
-                audio.play().then(() => {
-                    isPlaying = true;
-                    line.style.animationPlayState = 'running';
-                }).catch(error => {
-                    console.error('播放失败:', error);
-                    alert('播放失败，请检查文件路径是否正确');
-                });
-            } else {
-                alert('请先选择一首歌曲');
-            }
-        }
-
-        // 暂停音频
-        function pauseAudio() {
-            audio.pause();
-            isPlaying = false;
-            line.style.animationPlayState = 'paused';
-        }
-
-        // 切换播放/暂停状态
-        function togglePlay() {
-            if (isPlaying) {
-                pauseAudio();
-            } else {
-                playAudio();
-            }
-        }
-
-        // 显示播放列表 - 修复切换列表无法播放的问题
-        function showPlaylist(img) {
-            let playlistId = img.getAttribute('data-playlist');
-            if (!playlistId) return;
-            
-            // 隐藏所有播放列表
-            document.querySelectorAll('.playlist').forEach(playlist => {
-                playlist.style.display = 'none';
-            });
-            
-            // 显示当前图片对应的播放列表
-            let playlist = document.getElementById(playlistId);
-            playlist.style.display = 'block';
-            currentPlaylist = playlist;
-            
-            // 播放列表中的第一首歌并自动播放
-            let firstSong = playlist.querySelector('li');
-            if (firstSong) {
-                playSelectedSong(firstSong); // 直接播放第一首歌，而不是只加载信息
-            }
-            
-            // 更新显示的图片
-            let imageSrc = img.getAttribute('src');
-            let displayedImage = document.getElementById('displayed-image');
-            displayedImage.src = imageSrc;
-            displayedImage.style.display = 'block';
-            
-            // 更新专辑文本
-            let text = img.getAttribute('data-text');
-            document.getElementById('text-container').textContent = text;
-        }
-
-        // 播放选中的歌曲
-        function playSelectedSong(songElement) {
-            // 获取歌曲信息
-            let songSrc = songElement.getAttribute('data-song');
-            let lrcSrc = songElement.getAttribute('lrcSrc');
-            let songCover = songElement.getAttribute('data-cover');
-            let songName = songElement.getAttribute('data-text');
-            let duration = songElement.getAttribute('data-duration');
-            
-            // 更新播放状态
-            document.querySelectorAll('.playlist li').forEach(song => {
-                song.classList.remove('playing');
-            });
-            songElement.classList.add('playing');
-            
-            // 更新UI
-            document.querySelector('.musicName').textContent = songName;
-            document.getElementById('displayed-image').src = songCover || '安静.jpg';
-            document.getElementById('totalTime').textContent = duration || '00:00';
-            
-            // 显示加载提示
-            lyricsDisplay.innerHTML = '<div class="loading-lyrics">加载歌词中...</div>';
-            
-            // 停止当前播放并加载新歌曲
-            audio.pause();
-            audio.src = songSrc;
-            
-            // 加载完成后播放
-            audio.load();
-            audio.play().then(() => {
-                isPlaying = true;
-                line.style.animationPlayState = 'running';
-                
-                // 加载对应的LRC歌词
-                if (lrcSrc) {
-                    loadLrcLyrics(lrcSrc);
-                } else {
-                    lyricsDisplay.innerHTML = '<div class="lyric-line">无歌词</div>';
-                }
-            }).catch(error => {
-                console.error('播放失败:', error);
-                lyricsDisplay.innerHTML = '<div class="lyric-line">播放失败: 请检查音频文件路径</div>';
-            });
-        }
-
-        // 关闭所有播放列表
-        function closeAllPlaylists() {
-            document.querySelectorAll('.playlist').forEach(playlist => {
-                playlist.style.display = 'none';
-            });
-            currentPlaylist = null;
-        }
-
-        // 切换当前播放列表显示状态
-        function toggleCurrentPlaylist() {
-            if (!currentPlaylist) return;
-            
-            currentPlaylist.style.display = currentPlaylist.style.display === 'none' ? 'block' : 'none';
-        }
-
-        // 播放上一首
-        function playPrevious() {
-            if (!currentPlaylist) return;
-            
-            let songs = currentPlaylist.querySelectorAll('li');
-            let currentIndex = Array.from(songs).findIndex(song => song.classList.contains('playing'));
-            
-            // 如果没有选中的歌曲，默认播放第一首
-            if (currentIndex === -1) {
-                currentIndex = 0;
-            } else {
-                currentIndex = (currentIndex - 1 + songs.length) % songs.length;
-            }
-            
-            playSelectedSong(songs[currentIndex]);
-        }
-
-        // 播放下一首
-        function playNext() {
-            if (!currentPlaylist) return;
-            
-            let songs = currentPlaylist.querySelectorAll('li');
-            let currentIndex = Array.from(songs).findIndex(song => song.classList.contains('playing'));
-            
-            // 如果没有选中的歌曲，默认播放第一首
-            if (currentIndex === -1 || currentIndex >= songs.length - 1) {
-                currentIndex = 0;
-            } else {
-                currentIndex++;
-            }
-            
-            playSelectedSong(songs[currentIndex]);
-        }
-
-        // 处理音频播放结束
-        function handleAudioEnded() {
-            // 自动播放下一首
-            playNext();
-        }
-
-        // 更新播放进度
-        function updateProgress() {
-            if (isNaN(audio.duration)) return;
-            
-            // 更新进度条
-            let progress = (audio.currentTime / audio.duration) * 100;
-            curProgrees.style.width = progress + '%';
-            
-            // 更新进度条滑块
-            let progressBarWidth = progressBar.offsetWidth;
-            let position = (audio.currentTime / audio.duration) * progressBarWidth;
-            playHead.style.left = position + 'px';
-            timeIndicator.style.width = position + 'px';
-            
-            // 更新时间显示
-            presentTimeEl.textContent = formatTime(audio.currentTime);
-            
-            // 同步歌词显示
-            syncLyrics();
-        }
-
-        // 格式化时间（秒 -> mm:ss）
-        function formatTime(seconds) {
-            if (isNaN(seconds)) return '00:00';
-            
-            let minutes = Math.floor(seconds / 60);
-            let secs = Math.floor(seconds % 60);
-            return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-        }
-
-        // 进度条点击跳转
-        function seek(e) {
-            let progressWidth = document.getElementById('progrees').offsetWidth;
-            let clickPosition = e.offsetX;
-            let seekTime = (clickPosition / progressWidth) * audio.duration;
-            audio.currentTime = seekTime;
-        }
-
-        // 进度条点击跳转（另一个进度条）
-        function seekProgressBar(e) {
-            let progressWidth = progressBar.offsetWidth;
-            let clickPosition = e.offsetX;
-            let seekTime = (clickPosition / progressWidth) * audio.duration;
-            audio.currentTime = seekTime;
-        }
-
-        // 设置音量
-        function setVolume() {
-            audio.volume = volumeSlider.value / 100;
-            updateVolumeIcon();
-        }
-
-        // 切换静音状态
-        function toggleMute() {
-            audio.muted = !audio.muted;
-            updateVolumeIcon();
-        }
-
-        // 更新音量图标
-        function updateVolumeIcon() {
-            if (audio.muted) {
-                volumeIcon.src = "静音.png";
-            } else if (audio.volume < 0.5) {
-                volumeIcon.src = "音量小.png";
-            } else {
-                volumeIcon.src = "声音.png";
-            }
-        }
-
-        // 改变播放速度
-        function changePlaybackSpeed() {
-            // 播放速度选项：0.5x, 1.0x, 1.5x, 2.0x
-            const speeds = [0.5, 1.0, 1.5, 2.0];
-            let currentIndex = speeds.indexOf(speed);
-            currentIndex = (currentIndex + 1) % speeds.length;
-            speed = speeds[currentIndex];
-            
-            audio.playbackRate = speed;
-            speedDisplay.textContent = speed + 'X';
-        }
-
-        // 加载LRC歌词文件
-        function loadLrcLyrics(lrcSrc) {
-            // 清空现有歌词
-            lyricsDisplay.innerHTML = '';
-            lyricLines = [];
-            
-            // 显示加载提示
-            lyricsDisplay.innerHTML = '<div class="loading-lyrics">加载歌词中...</div>';
-            
-            // 使用fetch加载LRC文件
-            fetch(lrcSrc)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('歌词文件加载失败');
-                    }
-                    return response.text();
-                })
-                .then(lrcText => {
-                    // 解析LRC歌词
-                    parseLrcLyrics(lrcText);
-                })
-                .catch(error => {
-                    console.error('加载歌词出错:', error);
-                    lyricsDisplay.innerHTML = '<div class="lyric-line">无法加载歌词</div>';
-                });
-        }
-
-        // 解析LRC歌词内容
-        function parseLrcLyrics(lrcText) {
-            // 清空歌词容器
-            lyricsDisplay.innerHTML = '';
-            lyricLines = [];
-            
-            // 按行分割歌词
-            const lines = lrcText.split('\n');
-            
-            lines.forEach(line => {
-                // 匹配时间标签 [mm:ss.xx] 或 [mm:ss]
-                const timeMatch = line.match(/\[(\d+):(\d+\.\d+|\d+)\]/);
-                if (timeMatch) {
-                    const minutes = parseInt(timeMatch[1]);
-                    const seconds = parseFloat(timeMatch[2]);
-                    const time = minutes * 60 + seconds; // 转换为总秒数
-                    const text = line.replace(/\[.*?\]/g, '').trim(); // 提取歌词文本
-                    
-                    if (text) { // 只添加非空歌词
-                        const lyricEl = document.createElement('div');
-                        lyricEl.className = 'lyric-line';
-                        lyricEl.textContent = text;
-                        lyricsDisplay.appendChild(lyricEl);
-                        
-                        // 存储时间和对应的DOM元素
-                        lyricLines.push({ time, element: lyricEl });
-                    }
-                }
-            });
-            
-            // 如果没有解析到歌词
-            if (lyricLines.length === 0) {
-                lyricsDisplay.innerHTML = '<div class="lyric-line">无有效歌词</div>';
-            }
-        }
-
-        // 同步显示歌词
-        function syncLyrics() {
-            if (lyricLines.length === 0) return;
-            
-            const currentTime = audio.currentTime;
-            const containerHeight = lyricsDisplay.clientHeight;
-            const lineHeight = 30; // 每行歌词的高度
-            const centerIndex = Math.floor(containerHeight / (2 * lineHeight)); // 中间行索引
-            
-            // 查找当前播放时间对应的歌词
-            for (let i = 0; i < lyricLines.length; i++) {
-                // 检查当前时间是否在当前歌词和下一句歌词之间
-                const isCurrentLine = currentTime >= lyricLines[i].time && 
-                                     (!lyricLines[i + 1] || currentTime < lyricLines[i + 1].time);
-                
-                if (isCurrentLine) {
-                    // 移除所有歌词的active类
-                    lyricLines.forEach(lyric => {
-                        lyric.element.classList.remove('active');
-                    });
-                    
-                    // 为当前歌词添加active类
-                    lyricLines[i].element.classList.add('active');
-                    
-                    // 滚动歌词容器，使当前歌词居中显示
-                    const scrollPosition = Math.max(0, i - centerIndex) * lineHeight;
-                    lyricsDisplay.scrollTop = scrollPosition;
-                    break;
-                }
-            }
-        }
-
-        // 为所有缩略图添加点击事件以显示文本
-        document.querySelectorAll('.thumbnail').forEach(function(image) {
-            image.addEventListener('click', function() {
-                const text = this.getAttribute('data-text');
-                document.getElementById('text-container').textContent = text;
+        // 切换登录/注册标签
+        document.querySelectorAll('.auth-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabType = tab.dataset.tab;
+                document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(`${tabType}Form`).classList.add('active');
+                loginTip.textContent = '';
+                regTip.textContent = '';
             });
         });
+
+        // 获取/保存用户数据
+        const getUsers = () => JSON.parse(localStorage.getItem('systemUsers')) || [];
+        const saveUsers = (users) => localStorage.setItem('systemUsers', JSON.stringify(users));
+
+        // 注册功能
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('regUsername').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const confirmPwd = document.getElementById('regConfirmPwd').value;
+
+            if (!username) return regTip.textContent = '用户名不能为空';
+            if (password.length < 6) return regTip.textContent = '密码长度不能少于6位';
+            if (password !== confirmPwd) return regTip.textContent = '两次密码输入不一致';
+
+            const users = getUsers();
+            if (users.some(u => u.username === username)) {
+                return regTip.textContent = '该用户名已被注册';
+            }
+
+            users.push({ username, password });
+            saveUsers(users);
+            regTip.textContent = '注册成功，可登录！';
+            regTip.style.color = 'green';
+            document.querySelector('.auth-tab[data-tab="login"]').click();
+            document.getElementById('loginUsername').value = username;
+        });
+
+        // 登录功能
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            const users = getUsers();
+            const user = users.find(u => u.username === username && u.password === password);
+
+            if (user) {
+                localStorage.setItem('currentLoginUser', username);
+                authModal.style.display = 'none';
+                operationArea.style.display = 'block';
+                initStudentData();
+                render();
+            } else {
+                loginTip.textContent = '用户名或密码错误';
+            }
+        });
+
+        // 退出登录
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('currentLoginUser');
+            authModal.style.display = 'flex';
+            operationArea.style.display = 'none';
+            loginForm.reset();
+            loginTip.textContent = '';
+        });
+
+        // ====================== 学生就业信息相关 ======================
+        // 本地存储操作（确保ID正确）
+        const getStudentData = () => {
+            let data = JSON.parse(localStorage.getItem('studentData')) || [];
+            // 修复已有数据中ID为undefined的问题
+            if (data.length) {
+                data = data.map((item, index) => {
+                    if (item.stuid === undefined) {
+                        item.stuid = index + 1;
+                    }
+                    return item;
+                });
+                saveStudentData(data);
+            }
+            return data;
+        };
+        const saveStudentData = (data) => localStorage.setItem('studentData', JSON.stringify(data));
+
+        // 强制初始化默认数据（覆盖旧数据，确保页面加载就有数据）
+        const defaultData = [
+            { stuid: 1, name: "张三", gender: "男", age: 30, phone: "13245636217", yx: "北京大学", city: "深圳", salary: 12000, time: "2025/10/23" },
+            { stuid: 2, name: "林好", gender: "女", age: 32, phone: "13245636218", yx: "中山大学", city: "广州", salary: 8000, time: "2025/10/25" }
+        ];
+        
+        // 页面元素
+        const [tbody, titleEl, form, editModal, editForm] = [
+            document.querySelector('.table-body'),
+            document.querySelector('.title'),
+            document.querySelector('.info'),
+            document.getElementById('editModal'),
+            document.getElementById('editForm')
+        ];
+        const [searchInput, searchBtn, sortSelect, exportBtn, closeBtn, cancelBtn] = [
+            document.querySelector('.search-input'),
+            document.querySelector('.search-btn'),
+            document.querySelector('.sort-select'),
+            document.querySelector('.export'),
+            document.querySelector('.close-btn'),
+            document.querySelector('.cancel-btn')
+        ];
+
+        // 修复后的render函数（排序逻辑提前，确保加载时显示数据）
+        function render(filteredData = null) {
+            // 1. 优先读取传入的过滤数据，否则读本地存储
+            let data = filteredData || getStudentData();
+            
+            // 2. 排序逻辑（提前执行，不影响默认数据显示）
+            const sortType = sortSelect.value;
+            if (sortType !== 'default') {
+                const [key, order] = sortType.split('-');
+                data = [...data].sort((a, b) => {
+                    return order === 'asc' ? a[key] - b[key] : b[key] - a[key];
+                });
+            }
+
+            // 3. 显示统计数据
+            const totalCount = data.length;
+            titleEl.textContent = `共 ${totalCount} 条学生就业信息`;
+
+            // 4. 渲染表格
+            tbody.innerHTML = data.length 
+                ? data.map(item => `
+                    <tr>
+                        <td>${item.stuid}</td>
+                        <td>${item.name}</td>
+                        <td>${item.gender}</td>
+                        <td>${item.age}</td>
+                        <td>${item.phone}</td>
+                        <td>${item.yx}</td>
+                        <td>${item.city}</td>
+                        <td>${item.salary}</td>
+                        <td>${item.time}</td>
+                        <td class="operation">
+                            <a href="javascript:;" class="edit" data-id="${item.stuid}">编辑</a>
+                            <a href="javascript:;" class="delete" data-id="${item.stuid}">删除</a>
+                        </td>
+                    </tr>
+                `).join('')
+                : '<tr><td colspan="10" style="text-align:center">暂无匹配数据</td></tr>';
+        }
+
+        // 新增数据
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const [uname, gender, age, phone, yx, city, salary] = [
+                document.querySelector('.uname').value.trim(),
+                document.querySelector('.gender').value,
+                document.querySelector('.age').value,
+                document.querySelector('.phone').value.trim(),
+                document.querySelector('.yx').value.trim(),
+                document.querySelector('.city').value,
+                document.querySelector('.salary').value
+            ];
+            if (!uname || !gender || !age || !phone || !yx || !city || !salary) return alert('所有字段不能为空！');
+            if (!/^1[3-9]\d{9}$/.test(phone)) return alert('手机号格式错误！');
+
+            const data = getStudentData();
+            const maxId = data.length > 0 ? Math.max(...data.map(item => item.stuid)) : 0;
+            const newId = maxId + 1;
+
+            data.push({
+                stuid: newId,
+                name: uname,
+                gender,
+                age: +age,
+                phone,
+                yx,
+                city,
+                salary: +salary,
+                time: new Date().toLocaleDateString()
+            });
+            saveStudentData(data);
+            render();
+            form.reset();
+        });
+
+        // 编辑功能
+        tbody.addEventListener('click', (e) => {
+            if (e.target.classList.contains('edit')) {
+                const id = +e.target.dataset.id;
+                const item = getStudentData().find(i => i.stuid === id);
+                if (item) {
+                    document.getElementById('editId').value = item.stuid;
+                    document.getElementById('editName').value = item.name;
+                    document.getElementById('editGender').value = item.gender;
+                    document.getElementById('editAge').value = item.age;
+                    document.getElementById('editPhone').value = item.phone;
+                    document.getElementById('editYx').value = item.yx;
+                    document.getElementById('editCity').value = item.city;
+                    document.getElementById('editSalary').value = item.salary;
+                    editModal.style.display = 'flex';
+                }
+            }
+        });
+
+        // 保存编辑
+        editForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = +document.getElementById('editId').value;
+            const data = getStudentData();
+            const index = data.findIndex(item => item.stuid === id);
+            if (index !== -1) {
+                data[index] = {
+                    ...data[index],
+                    name: document.getElementById('editName').value.trim(),
+                    gender: document.getElementById('editGender').value,
+                    age: +document.getElementById('editAge').value,
+                    phone: document.getElementById('editPhone').value.trim(),
+                    yx: document.getElementById('editYx').value.trim(),
+                    city: document.getElementById('editCity').value,
+                    salary: +document.getElementById('editSalary').value
+                };
+                saveStudentData(data);
+                render();
+                editModal.style.display = 'none';
+            }
+        });
+
+        // 删除功能
+        tbody.addEventListener('click', (e) => {
+            if (e.target.classList.contains('delete') && confirm('确定删除？')) {
+                const id = +e.target.dataset.id;
+                saveStudentData(getStudentData().filter(item => item.stuid !== id));
+                render();
+            }
+        });
+
+        // 搜索功能
+        function handleSearch() {
+            const keyword = searchInput.value.trim().toLowerCase();
+            render(keyword ? getStudentData().filter(item => 
+                item.name.toLowerCase().includes(keyword) ||
+                item.yx.toLowerCase().includes(keyword) ||
+                item.city.toLowerCase().includes(keyword)
+            ) : null);
+        }
+        searchBtn.addEventListener('click', handleSearch);
+        searchInput.addEventListener('keyup', (e) => e.key === 'Enter' && handleSearch());
+
+        // 排序功能
+        sortSelect.addEventListener('change', render);
+
+        // 导出功能
+        function exportToExcel() {
+            const data = getStudentData();
+            if (!data.length) return alert('暂无数据可导出！');
+            const csv = 'ID,姓名,性别,年龄,电话号码,毕业院校,就业城市,薪资,录入时间\n' +
+            data.map(item => `${item.stuid},${item.name},${item.gender},${item.age},${item.phone},${item.yx},${item.city},${item.salary},${item.time}`).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `学生就业信息_${new Date().toLocaleDateString()}.csv`;
+            a.click();
+        }
+        exportBtn.addEventListener('click', exportToExcel);
+
+        // 关闭编辑弹窗
+        closeBtn.addEventListener('click', () => editModal.style.display = 'none');
+        cancelBtn.addEventListener('click', () => editModal.style.display = 'none');
+
+        // 页面加载时强制渲染本地存储数据
+        window.onload = () => {
+            render(getStudentData());
+        };
     </script>
 </body>
 </html>

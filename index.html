@@ -4,729 +4,1824 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>微博 - 发现新鲜事</title>
-  <!-- 引入Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- 引入Font Awesome -->
-  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
-  
-  <!-- 配置Tailwind -->
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: '#1DA1F2',
-            secondary: '#657786',
-            light: '#F5F8FA',
-            dark: '#14171A'
-          },
-          fontFamily: {
-            sans: ['Inter', 'system-ui', 'sans-serif'],
-          },
-        },
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f5f8fa;
+      color: #14171a;
+      line-height: 1.5;
+    }
+
+    .header {
+      background-color: white;
+      border-bottom: 1px solid #e6ecf0;
+      padding: 10px 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .nav-user{
+      position: relative;
+      top: -10px;
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 24px;
+      font-weight: bold;
+      color: #1da1f2;
+    }
+
+    .nav-search {
+      flex: 1;
+      max-width: 400px;
+      margin: 0 20px;
+      position: relative;
+    }
+
+    .nav-search input {
+      width: 100%;
+      padding: 8px 12px 8px 36px;
+      border-radius: 20px;
+      border: 1px solid #e6ecf0;
+      background-color: #f5f8fa;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .nav-search input:focus {
+      background-color: white;
+      border-color: #1da1f2;
+    }
+
+    .nav-search i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #657786;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .nav-link {
+      color: #657786;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .nav-link.active,
+    .nav-link:hover {
+      color: #1da1f2;
+    }
+
+    /* 关键：三栏布局容器 */
+    .container {
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 0 20px;
+      display: flex; /* 横向排列 */
+      gap: 20px;
+    }
+
+    /* 左侧边栏 */
+    .sidebar-left {
+      width: 280px;
+      flex-shrink: 0; /* 固定宽度不缩放 */
+    }
+
+    /* 中间主内容区 */
+    .main-content {
+      flex: 1; /* 占剩余空间 */
+      max-width: 600px;
+    }
+
+    /* 右侧边栏（新增） */
+    .sidebar-right {
+      width: 280px;
+      flex-shrink: 0; /* 固定宽度不缩放 */
+    }
+
+    /* 侧边栏通用样式（左右侧通用） */
+    .sidebar-section {
+      background-color: white;
+      border-radius: 15px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .sidebar-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      color: #14171a;
+    }
+
+    .trending-item {
+      margin-bottom: 15px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      padding: 5px;
+      border-radius: 8px;
+    }
+
+    .trending-item:hover {
+      background-color: #f5f8fa;
+    }
+
+    .trending-topic {
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+
+    .trending-count {
+      font-size: 14px;
+      color: #657786;
+    }
+
+    .user-item {
+      margin-bottom: 15px;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-avatar {
+      position: relative;
+      top: 20px;
+      margin: 10px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .user-name {
+      font-weight: 600;
+    }
+
+    .user-handle {
+      font-size: 14px;
+      color: #657786;
+    }
+
+    /* 发布区域样式 */
+    .publish-section {
+      background-color: white;
+      border-radius: 15px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .publish-header {
+      display: flex;
+      gap: 10px;
+    }
+
+    .publish-input-container {
+      flex: 1;
+    }
+
+    #weibo-content {
+      width: 100%;
+      border: none;
+      outline: none;
+      resize: none;
+      font-size: 16px;
+      padding: 10px 0;
+      min-height: 80px;
+    }
+
+    .publish-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .action-btn {
+      background: none;
+      border: none;
+      color: #1da1f2;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
+      border-radius: 20px;
+      transition: background-color 0.2s;
+    }
+
+    .action-btn:hover {
+      background-color: #e8f5fe;
+    }
+
+    .publish-button {
+      background-color: #1da1f2;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .publish-button:disabled {
+      background-color: #a5d8ff;
+      cursor: not-allowed;
+    }
+
+    .publish-button:hover:not(:disabled) {
+      background-color: #1a91da;
+    }
+
+    /* 微博列表样式 */
+    .weibo-container {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .weibo-item {
+      background-color: white;
+      border-radius: 15px;
+      padding: 15px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .weibo-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+
+    .weibo-header {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .weibo-user-info {
+      flex: 1;
+    }
+
+    .weibo-username {
+      font-weight: 600;
+    }
+
+    .weibo-time {
+      font-size: 14px;
+      color: #657786;
+    }
+
+    .weibo-content {
+      margin-bottom: 10px;
+      line-height: 1.6;
+    }
+
+    .weibo-images {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-bottom: 10px;
+    }
+
+    .weibo-image {
+      width: calc(50% - 5px);
+      border-radius: 10px;
+      object-fit: cover;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .weibo-image:hover {
+      transform: scale(1.02);
+    }
+
+    .weibo-actions {
+      display: flex;
+      justify-content: space-around;
+      padding-top: 10px;
+      border-top: 1px solid #f5f8fa;
+    }
+
+    .action-count {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: #657786;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 5px 10px;
+      border-radius: 20px;
+      transition: all 0.2s;
+    }
+
+    .action-count:hover {
+      background-color: #e8f5fe;
+      color: #1da1f2;
+    }
+
+    .liked {
+      color: #e0245e;
+    }
+
+    .btn {
+      padding: 12px 10px;
+      border-radius: 10px;
+      font-weight: 600;
+      height: 45px;
+      width: 70px;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin: 6px;
+    }
+
+    .btn-primary {
+      background-color: #1da1f2;
+      color: white;
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background-color: #1a91da;
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      color: #1da1f2;
+      border: 1px solid #1da1f2;
+    }
+
+    .btn-outline:hover {
+      background-color: #e8f5fe;
+    }
+
+    /* 右侧关注按钮小样式 */
+    .btn-follow {
+      padding: 4px 10px;
+      font-size: 14px;
+      margin-left: auto; /* 靠右对齐 */
+    }
+
+    /* 模态框样式 */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1001;
+    }
+
+    .modal-content {
+      background-color: white;
+      border-radius: 15px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+    }
+
+    .modal-header {
+      padding: 15px 20px;
+      border-bottom: 1px solid #e6ecf0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #657786;
+      transition: color 0.2s;
+    }
+
+    .close-btn:hover {
+      color: #14171a;
+    }
+
+    .modal-body {
+      padding: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #e6ecf0;
+      border-radius: 8px;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .form-input:focus {
+      border-color: #1da1f2;
+    }
+
+    .form-switch {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 15px 0;
+    }
+
+    .form-link {
+      color: #1da1f2;
+      text-decoration: none;
+    }
+
+    .form-link:hover {
+      text-decoration: underline;
+    }
+
+    .comments-section {
+      margin-top: 12px;
+      border-top: 1px solid #e6ecf0;
+      padding-top: 12px;
+    }
+
+    .comment-item {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .comment-content {
+      background: #f8f9fa;
+      padding: 10px 12px;
+      border-radius: 12px;
+      flex: 1;
+    }
+
+    .comment-username {
+      font-weight: bold;
+      color: #14171a;
+      margin-bottom: 4px;
+    }
+
+    .comment-text {
+      color: #14171a;
+      line-height: 1.4;
+    }
+
+    .emoji-picker {
+      background: white;
+      border: 1px solid #e6ecf0;
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .emoji-category span {
+      font-weight: 500;
+      color: #657786;
+      font-size: 14px;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .emoji-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .emoji {
+      font-size: 20px;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      transition: background-color 0.2s ease;
+    }
+
+    .emoji:hover {
+      background-color: #e8f5fe;
+    }
+
+    .image-preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .preview-item {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .preview-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .remove-image {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background-color: rgba(0,0,0,0.5);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.2s;
+    }
+
+    .remove-image:hover {
+      background-color: rgba(0,0,0,0.7);
+    }
+
+    /* 响应式布局（关键：控制右侧列显示） */
+    @media (max-width: 1200px) {
+      .container {
+        max-width: 1000px;
       }
     }
-  </script>
-  
-  <style type="text/tailwindcss">
-    @layer utilities {
-      .content-auto {
-        content-visibility: auto;
-      }
-      .scrollbar-hide {
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-      }
-      .scrollbar-hide::-webkit-scrollbar {
+
+    /* 屏幕小于1000px时，隐藏左右侧边栏 */
+    @media (max-width: 1000px) {
+      .sidebar-left, .sidebar-right {
         display: none;
       }
-      .text-shadow {
-        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      .main-content {
+        max-width: 100%;
+        width: 100%;
       }
-      .card-hover {
-        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    @media (max-width: 768px) {
+      .nav-search {
+        width: 200px;
       }
-      .card-hover:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-      }
+    }
+
+    .footer {
+      background: white;
+      border-top: 1px solid #e6ecf0;
+      padding: 20px 0;
+      margin-top: 30px;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .footer-link {
+      color: #657786;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .footer-link:hover {
+      color: #1da1f2;
+    }
+
+    .copyright {
+      text-align: center;
+      color: #657786;
+      font-size: 13px;
+      margin-top: 15px;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(29, 161, 242, 0.3);
+      border-radius: 50%;
+      border-top-color: #1da1f2;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #657786;
+    }
+
+    .empty-state i {
+      font-size: 40px;
+      margin-bottom: 15px;
+      color: #ccd6dd;
+    }
+
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      z-index: 1001;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* 深色模式适配 */
+    body.dark-theme {
+      background-color: #15202b;
+      color: #ffffff;
+    }
+
+    body.dark-theme .header,
+    body.dark-theme .sidebar-section,
+    body.dark-theme .publish-section,
+    body.dark-theme .weibo-item,
+    body.dark-theme .modal-content,
+    body.dark-theme .footer {
+      background-color: #192734;
+      color: #ffffff;
+    }
+
+    body.dark-theme .nav-search {
+      background: #253341;
+    }
+
+    body.dark-theme .nav-search input {
+      color: #ffffff;
+      background-color: #253341;
+    }
+
+    body.dark-theme .form-input {
+      background-color: #253341;
+      border-color: #38444d;
+      color: #ffffff;
+    }
+
+    body.dark-theme .comment-content {
+      background-color: #253341;
+    }
+
+    body.dark-theme .trending-count,
+    body.dark-theme .user-handle,
+    body.dark-theme .weibo-time,
+    body.dark-theme .footer-link,
+    body.dark-theme .copyright {
+      color: #8899a6;
+    }
+
+    body.dark-theme .form-label,
+    body.dark-theme .sidebar-title,
+    body.dark-theme .weibo-username,
+    body.dark-theme .comment-username {
+      color: #ffffff;
     }
   </style>
 </head>
-
-<body class="bg-light text-dark font-sans">
-  <!-- 导航栏 -->
-  <header class="sticky top-0 z-50 bg-white shadow-sm transition-all duration-300" id="navbar">
-    <div class="container mx-auto px-4 py-3 flex items-center justify-between">
-      <!-- Logo -->
-      <div class="flex items-center">
-        <a href="#" class="text-primary text-3xl font-bold mr-2">
-          <i class="fa fa-weibo"></i>
-        </a>
-        <h1 class="text-xl font-bold hidden md:block">微博</h1>
+<body>
+  <!-- 头部导航 -->
+  <header class="header">
+    <div class="nav-container">
+      <div class="nav-brand">
+        <i class="fab fa-weibo"></i>
+        <span>微博</span>
       </div>
       
-      <!-- 搜索栏 -->
-      <div class="hidden md:block flex-grow max-w-xl mx-8">
-        <div class="relative">
-          <input type="text" placeholder="搜索微博、用户..." 
-                 class="w-full py-2 px-4 pl-10 rounded-full bg-light focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all">
-          <i class="fa fa-search absolute left-4 top-1/2 -translate-y-1/2 text-secondary"></i>
-        </div>
+      <div class="nav-search">
+        <i class="fas fa-search"></i>
+        <input type="text" placeholder="搜索微博" id="search-input">
       </div>
       
-      <!-- 导航菜单 -->
-      <nav class="flex items-center space-x-1 md:space-x-4">
-        <button class="md:hidden text-xl p-2 rounded-full hover:bg-light transition-colors">
-          <i class="fa fa-search"></i>
-        </button>
-        <a href="#" class="text-xl p-2 rounded-full hover:bg-light transition-colors relative">
-          <i class="fa fa-home"></i>
-          <span class="hidden md:inline-block ml-1">首页</span>
+      <nav class="nav-links">
+        <a href="#" class="nav-link active">
+          <i class="fas fa-home"></i>
+          <span>首页</span>
         </a>
-        <a href="#" class="text-xl p-2 rounded-full hover:bg-light transition-colors relative">
-          <i class="fa fa-bell-o"></i>
-          <span class="hidden md:inline-block ml-1">通知</span>
-          <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+        <a href="#" class="nav-link">
+          <i class="fas fa-video"></i>
+          <span>视频</span>
         </a>
-        <a href="#" class="text-xl p-2 rounded-full hover:bg-light transition-colors">
-          <i class="fa fa-envelope-o"></i>
-          <span class="hidden md:inline-block ml-1">私信</span>
+        <a href="#" class="nav-link">
+          <i class="fas fa-compass"></i>
+          <span>发现</span>
         </a>
-        <div class="relative group">
-          <button class="flex items-center space-x-1 p-1 rounded-full hover:bg-light transition-colors">
-            <img src="https://picsum.photos/200/200?random=1" alt="用户头像" class="w-8 h-8 rounded-full object-cover border-2 border-primary">
-            <span class="hidden md:inline-block font-medium">我的账号</span>
-            <i class="fa fa-chevron-down text-xs hidden md:block"></i>
-          </button>
-          <!-- 下拉菜单 -->
-          <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right scale-95 group-hover:scale-100">
-            <a href="#" class="block px-4 py-2 hover:bg-light transition-colors">
-              <i class="fa fa-user-o mr-2"></i>个人主页
-            </a>
-            <a href="#" class="block px-4 py-2 hover:bg-light transition-colors">
-              <i class="fa fa-cog mr-2"></i>设置
-            </a>
-            <div class="border-t my-1"></div>
-            <a href="#" class="block px-4 py-2 hover:bg-light transition-colors text-red-500">
-              <i class="fa fa-sign-out mr-2"></i>退出登录
-            </a>
-          </div>
-        </div>
+        <a href="#" class="nav-link">
+          <i class="fas fa-gamepad"></i>
+          <span>游戏</span>
+        </a>
       </nav>
+      
+      <div class="nav-user " id="nav-user">
+        <button id="login-btn" class="btn btn-outline">登录</button>
+        <button id="register-btn" class="btn btn-primary">注册</button>
+      </div>
     </div>
   </header>
-
-  <!-- 主要内容区 -->
-  <main class="container mx-auto px-4 py-6 flex flex-col md:flex-row gap-6">
-    <!-- 左侧边栏 - 个人信息 -->
-     <aside class="md:w-64 lg:w-80 flex-shrink-0">
-      <div class="sticky top-24 bg-white rounded-xl shadow-sm overflow-hidden">
-        <!-- 封面图区域（已调整高度，避免遮挡头像） -->
-        <div class="h-20 bg-gradient-to-r from-primary to-blue-400 relative">
-          <button class="absolute bottom-3 right-3 bg-white/80 hover:bg-white text-primary rounded-full p-2 transition-colors">
-            <i class="fa fa-camera"></i>
-          </button>
-        </div>
-        
-        <!-- 个人信息 -->
-         <div class="px-6 pb-4 pt-[-3.5rem]"> <!-- 使用负margin调整位置，不遮挡头像 -->
-        
-          <img src="https://picsum.photos/200/200?random=1" alt="用户头像" class="w-20 h-20 rounded-full object-cover border-4 border-white mb-3">
-          <h2 class="font-bold text-xl">张小明</h2>
-          <p class="text-secondary text-sm mb-4">@zhangxiaoming · 加入于2018年</p>
-          
-          <!-- 统计数据 -->
-          <div class="flex justify-between text-center mb-4">
-            <div>
-              <p class="font-bold">286</p>
-              <p class="text-secondary text-sm">关注</p>
-            </div>
-            <div>
-              <p class="font-bold">1.2k</p>
-              <p class="text-secondary text-sm">粉丝</p>
-            </div>
-            <div>
-              <p class="font-bold">3.5k</p>
-              <p class="text-secondary text-sm">微博</p>
-            </div>
-          </div>
-          
-          <button class="w-full bg-primary hover:bg-primary/90 text-white py-2 rounded-full transition-colors">
-            编辑资料
-          </button>
-        </div>
-      </div>
-      
-      <!-- 推荐关注 -->
-      <div class="sticky top-[calc(24rem+1rem)] bg-white rounded-xl shadow-sm p-4 mt-6">
-        <h3 class="font-bold text-lg mb-4">推荐关注</h3>
-        <div class="space-y-4">
-          <!-- 推荐用户1 -->
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-              <img src="https://picsum.photos/200/200?random=2" alt="推荐用户" class="w-10 h-10 rounded-full object-cover">
-              <div>
-                <p class="font-medium">科技前沿</p>
-                <p class="text-secondary text-sm">@techfront</p>
-              </div>
-            </div>
-            <button class="text-primary border border-primary hover:bg-primary/5 px-3 py-1 rounded-full text-sm transition-colors">
-              关注
-            </button>
-          </div>
-          
-          <!-- 推荐用户2 -->
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-              <img src="https://picsum.photos/200/200?random=3" alt="推荐用户" class="w-10 h-10 rounded-full object-cover">
-              <div>
-                <p class="font-medium">美食探店</p>
-                <p class="text-secondary text-sm">@foodexplorer</p>
-              </div>
-            </div>
-            <button class="text-primary border border-primary hover:bg-primary/5 px-3 py-1 rounded-full text-sm transition-colors">
-              关注
-            </button>
-          </div>
-        </div>
-        
-        <button class="w-full text-primary hover:text-primary/80 py-2 mt-2 text-sm transition-colors">
-          显示更多
-        </button>
-      </div>
-    </aside>
-    
-    <!-- 中间内容区 - 微博流 -->
-    <div class="flex-grow max-w-2xl mx-auto">
-      <!-- 发布微博框 -->
-      <div class="bg-white rounded-xl shadow-sm p-4 mb-6">
-        <div class="flex space-x-3">
-          <img src="https://picsum.photos/200/200?random=1" alt="用户头像" class="w-10 h-10 rounded-full object-cover">
-          <div class="flex-grow">
-            <textarea placeholder="分享你的想法..." 
-                      class="w-full border border-gray-200 rounded-full p-3 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all resize-none h-20"></textarea>
-            
-            <!-- 发布工具 -->
-            <div class="flex justify-between items-center mt-3">
-              <div class="flex space-x-3 text-primary">
-                <button class="p-2 rounded-full hover:bg-primary/10 transition-colors" title="图片">
-                  <i class="fa fa-picture-o"></i>
-                </button>
-                <button class="p-2 rounded-full hover:bg-primary/10 transition-colors" title="视频">
-                  <i class="fa fa-video-camera"></i>
-                </button>
-                <button class="p-2 rounded-full hover:bg-primary/10 transition-colors" title="话题">
-                  <i class="fa fa-hashtag"></i>
-                </button>
-                <button class="p-2 rounded-full hover:bg-primary/10 transition-colors" title="表情">
-                  <i class="fa fa-smile-o"></i>
-                </button>
-              </div>
-              <button class="bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-full transition-colors font-medium">
-                发布
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- 微博列表 -->
-      <div class="space-y-4" id="weibo-feed">
-        <!-- 微博1 - 纯文字 -->
-        <article class="bg-white rounded-xl shadow-sm p-4 card-hover">
-          <div class="flex space-x-3">
-            <img src="https://picsum.photos/200/200?random=4" alt="用户头像" class="w-10 h-10 rounded-full object-cover">
-            <div class="flex-grow">
-              <div class="flex items-center justify-between">
-                <div>
-                  <h3 class="font-medium">旅行日记</h3>
-                  <p class="text-secondary text-sm">@travel_diary · 2小时前</p>
-                </div>
-                <button class="text-secondary hover:text-dark transition-colors">
-                  <i class="fa fa-ellipsis-h"></i>
-                </button>
-              </div>
-              
-              <div class="mt-2">
-                <p>今天去了郊外徒步，空气真的太好了！远离城市的喧嚣，感受大自然的美好，整个人都放松下来了。推荐大家有空也多出去走走，对身心都很有好处。</p>
-              </div>
-              
-              <div class="mt-3 flex justify-between text-secondary">
-                <button class="flex items-center space-x-1 hover:text-primary transition-colors p-2 rounded-full hover:bg-primary/10">
-                  <i class="fa fa-comment-o"></i>
-                  <span>42</span>
-                </button>
-                <button class="flex items-center space-x-1 hover:text-green-500 transition-colors p-2 rounded-full hover:bg-green-500/10">
-                  <i class="fa fa-retweet"></i>
-                  <span>18</span>
-                </button>
-                <button class="flex items-center space-x-1 hover:text-red-500 transition-colors p-2 rounded-full hover:bg-red-500/10">
-                  <i class="fa fa-heart-o"></i>
-                  <span>126</span>
-                </button>
-                <button class="flex items-center space-x-1 hover:text-primary transition-colors p-2 rounded-full hover:bg-primary/10">
-                  <i class="fa fa-share"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        </article>
-        
-        <!-- 微博2 - 单张图片 -->
-        <article class="bg-white rounded-xl shadow-sm p-4 card-hover">
-          <div class="flex space-x-3">
-            <img src="https://picsum.photos/200/200?random=5" alt="用户头像" class="w-10 h-10 rounded-full object-cover">
-            <div class="flex-grow">
-              <div class="flex items-center justify-between">
-                <div>
-                  <h3 class="font-medium">美食家</h3>
-                  <p class="text-secondary text-sm">@foodie · 昨天 18:30</p>
-                </div>
-                <button class="text-secondary hover:text-dark transition-colors">
-                  <i class="fa fa-ellipsis-h"></i>
-                </button>
-              </div>
-              
-              <div class="mt-2">
-                <p>今天尝试做了红烧肉，第一次做没想到这么成功！色泽红亮，肥而不腻，香气扑鼻，全家人都爱吃～ 做法放在评论区了，感兴趣的可以试试！#美食分享#</p>
-                
-                <!-- 单张图片 -->
-                <div class="mt-3 rounded-xl overflow-hidden cursor-pointer group">
-                  <img src="https://picsum.photos/800/600?random=10" alt="红烧肉" 
-                       class="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105">
-                </div>
-              </div>
-              
-              <div class="mt-3 flex justify-between text-secondary">
-                <button class="flex items-center space-x-1 hover:text-primary transition-colors p-2 rounded-full hover:bg-primary/10">
-                  <i class="fa fa-comment-o"></i>
-                  <span>89</span>
-                </button>
-                <button class="flex items-center space-x-1 hover:text-green-500 transition-colors p-2 rounded-full hover:bg-green-500/10">
-                  <i class="fa fa-retweet"></i>
-                  <span>56</span>
-                </button>
-                <button class="flex items-center space-x-1 hover:text-red-500 transition-colors p-2 rounded-full hover:bg-red-500/10">
-                  <i class="fa fa-heart-o"></i>
-                  <span>324</span>
-                </button>
-                <button class="flex items-center space-x-1 hover:text-primary transition-colors p-2 rounded-full hover:bg-primary/10">
-                  <i class="fa fa-share"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        </article>
-        
-        <!-- 微博3 - 多张图片 -->
-        <article class="bg-white rounded-xl shadow-sm p-4 card-hover">
-          <div class="flex space-x-3">
-            <img src="https://picsum.photos/200/200?random=6" alt="用户头像" class="w-10 h-10 rounded-full object-cover">
-            <div class="flex-grow">
-              <div class="flex items-center justify-between">
-                <div>
-                  <h3 class="font-medium">摄影师小李</h3>
-                  <p class="text-secondary text-sm">@photographer_li · 3天前</p>
-                </div>
-                <button class="text-secondary hover:text-dark transition-colors">
-                  <i class="fa fa-ellipsis-h"></i>
-                </button>
-              </div>
-              
-              <div class="mt-2">
-                <p>周末去海边拍的一组照片，天气特别好，海水蓝得像宝石一样。分享给大家～ #海边摄影# #自然风光#</p>
-                
-                <!-- 多张图片 -->
-                <div class="mt-3 grid grid-cols-2 gap-2 rounded-xl overflow-hidden">
-                  <div class="cursor-pointer group">
-                    <img src="https://picsum.photos/400/400?random=11" alt="海边照片1" 
-                         class="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-105">
-                  </div>
-                  <div class="cursor-pointer group">
-                    <img src="https://picsum.photos/400/400?random=12" alt="海边照片2" 
-                         class="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-105">
-                  </div>
-                  <div class="cursor-pointer group">
-                    <img src="https://picsum.photos/400/400?random=13" alt="海边照片3" 
-                         class="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-105">
-                  </div>
-                  <div class="cursor-pointer group relative">
-                    <img src="https://picsum.photos/400/400?random=14" alt="海边照片4" 
-                         class="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-105">
-                    <div class="absolute inset-0 bg-black/50 flex items-center justify-center text-white font-medium">
-                      +2
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="mt-3 flex justify-between text-secondary">
-                <button class="flex items-center space-x-1 hover:text-primary transition-colors p-2 rounded-full hover:bg-primary/10">
-                  <i class="fa fa-comment-o"></i>
-                  <span>156</span>
-                </button>
-                <button class="flex items-center space-x-1 hover:text-green-500 transition-colors p-2 rounded-full hover:bg-green-500/10">
-                  <i class="fa fa-retweet"></i>
-                  <span>98</span>
-                </button>
-                <button class="flex items-center space-x-1 hover:text-red-500 transition-colors p-2 rounded-full hover:bg-red-500/10">
-                  <i class="fa fa-heart-o"></i>
-                  <span>752</span>
-                </button>
-                <button class="flex items-center space-x-1 hover:text-primary transition-colors p-2 rounded-full hover:bg-primary/10">
-                  <i class="fa fa-share"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        </article>
-        
-        <!-- 微博4 - 带话题 -->
-        <article class="bg-white rounded-xl shadow-sm p-4 card-hover">
-          <div class="flex space-x-3">
-            <img src="https://picsum.photos/200/200?random=7" alt="用户头像" class="w-10 h-10 rounded-full object-cover">
-            <div class="flex-grow">
-              <div class="flex items-center justify-between">
-                <div>
-                  <h3 class="font-medium">电影爱好者</h3>
-                  <p class="text-secondary text-sm">@movie_lover · 1周前</p>
-                </div>
-                <button class="text-secondary hover:text-dark transition-colors">
-                  <i class="fa fa-ellipsis-h"></i>
-                </button>
-              </div>
-              
-              <div class="mt-2">
-                <p>刚刚看完《流浪地球3》的首映，真的太震撼了！中国科幻电影越来越棒了，特效场面宏大，剧情也很感人，强烈推荐大家去看！</p>
-                <p class="mt-1">
-                  <a href="#" class="text-primary hover:underline">#流浪地球3#</a> 
-                  <a href="#" class="text-primary hover:underline">#科幻电影#</a> 
-                  <a href="#" class="text-primary hover:underline">#国产电影#</a>
-                </p>
-                
-                <!-- 单张图片 -->
-                <div class="mt-3 rounded-xl overflow-hidden cursor-pointer group">
-                  <img src="https://picsum.photos/800/450?random=15" alt="电影海报" 
-                       class="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105">
-                </div>
-              </div>
-              
-              <div class="mt-3 flex justify-between text-secondary">
-                <button class="flex items-center space-x-1 hover:text-primary transition-colors p-2 rounded-full hover:bg-primary/10">
-                  <i class="fa fa-comment-o"></i>
-                  <span>328</span>
-                </button>
-                <button class="flex items-center space-x-1 hover:text-green-500 transition-colors p-2 rounded-full hover:bg-green-500/10">
-                  <i class="fa fa-retweet"></i>
-                  <span>256</span>
-                </button>
-                <button class="flex items-center space-x-1 hover:text-red-500 transition-colors p-2 rounded-full hover:bg-red-500/10">
-                  <i class="fa fa-heart-o"></i>
-                  <span>1254</span>
-                </button>
-                <button class="flex items-center space-x-1 hover:text-primary transition-colors p-2 rounded-full hover:bg-primary/10">
-                  <i class="fa fa-share"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        </article>
-      </div>
-      
-      <!-- 加载更多 -->
-      <div class="text-center mt-8 mb-4">
-        <button id="load-more" class="bg-white border border-gray-200 hover:bg-light text-dark px-6 py-2 rounded-full transition-colors font-medium flex items-center mx-auto">
-          <span>加载更多</span>
-          <i class="fa fa-refresh ml-2"></i>
-        </button>
-      </div>
-    </div>
-    
-    <!-- 右侧边栏 - 热门话题和推荐 -->
-    <aside class="hidden lg:block w-80 flex-shrink-0">
-      <!-- 搜索框（仅在大屏幕显示） -->
-      <div class="bg-white rounded-xl shadow-sm p-4 mb-6">
-        <div class="relative">
-          <input type="text" placeholder="搜索微博、用户..." 
-                 class="w-full py-2 px-4 pl-10 rounded-full bg-light focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all">
-          <i class="fa fa-search absolute left-4 top-1/2 -translate-y-1/2 text-secondary"></i>
-        </div>
-      </div>
-      
-      <!-- 热门话题 -->
-      <div class="bg-white rounded-xl shadow-sm p-4 mb-6">
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="font-bold text-lg">热门话题</h3>
-          <a href="#" class="text-secondary hover:text-primary transition-colors">
-            <i class="fa fa-refresh"></i>
-          </a>
-        </div>
-        
-        <div class="space-y-4">
-          <!-- 话题1 -->
-          <div class="cursor-pointer hover:bg-light p-2 rounded-lg transition-colors">
-            <p class="text-secondary text-sm">热搜 · 128万讨论</p>
-            <p class="font-medium">2024年最新科技产品发布会</p>
-          </div>
-          
-          <!-- 话题2 -->
-          <div class="cursor-pointer hover:bg-light p-2 rounded-lg transition-colors">
-            <p class="text-secondary text-sm">热搜 · 86万讨论</p>
-            <p class="font-medium">全国大学生创新创业大赛圆满结束</p>
-          </div>
-          
-          <!-- 话题3 -->
-          <div class="cursor-pointer hover:bg-light p-2 rounded-lg transition-colors">
-            <p class="text-secondary text-sm">热搜 · 52万讨论</p>
-            <p class="font-medium">夏季旅游最佳目的地推荐</p>
-          </div>
-          
-          <!-- 话题4 -->
-          <div class="cursor-pointer hover:bg-light p-2 rounded-lg transition-colors">
-            <p class="text-secondary text-sm">热搜 · 34万讨论</p>
-            <p class="font-medium">最新研究发现：每天步行8000步有益健康</p>
-          </div>
-        </div>
-        
-        <button class="w-full text-primary hover:text-primary/80 py-2 mt-2 text-sm transition-colors">
-          显示更多
-        </button>
-      </div>
-      
-      <!-- 推荐微博 -->
-      <div class="bg-white rounded-xl shadow-sm p-4">
-        <h3 class="font-bold text-lg mb-4">推荐微博</h3>
-        
-        <div class="space-y-4">
-          <!-- 推荐微博1 -->
-          <div class="cursor-pointer hover:bg-light p-2 rounded-lg transition-colors">
-            <div class="flex items-center space-x-2">
-              <img src="https://picsum.photos/200/200?random=8" alt="推荐用户" class="w-8 h-8 rounded-full object-cover">
-              <p class="font-medium text-sm">健康生活</p>
-            </div>
-            <p class="text-sm mt-1 line-clamp-2">夏季养生小知识：多吃清热解暑的食物，如绿豆、西瓜等，同时注意补充水分，避免长时间暴晒。</p>
-          </div>
-          
-          <!-- 推荐微博2 -->
-          <div class="cursor-pointer hover:bg-light p-2 rounded-lg transition-colors">
-            <div class="flex items-center space-x-2">
-              <img src="https://picsum.photos/200/200?random=9" alt="推荐用户" class="w-8 h-8 rounded-full object-cover">
-              <p class="font-medium text-sm">音乐达人</p>
-            </div>
-            <p class="text-sm mt-1 line-clamp-2">新专辑终于发布了！感谢所有支持我的粉丝，这张专辑包含了我近两年来的创作心血，希望大家喜欢。</p>
-          </div>
-        </div>
-        
-        <button class="w-full text-primary hover:text-primary/80 py-2 mt-2 text-sm transition-colors">
-          显示更多
-        </button>
-      </div>
-    </aside>
-  </main>
   
-  <!-- 图片查看器模态框 -->
-  <div id="image-viewer" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-4">
-    <button id="close-viewer" class="absolute top-4 right-4 text-white text-3xl hover:text-gray-300 transition-colors">
-      <i class="fa fa-times"></i>
-    </button>
-    <img id="viewer-image" src="" alt="大图预览" class="max-w-[90%] max-h-[90vh] object-contain">
+  <!-- 三栏布局容器 -->
+  <div class="container">
+    <!-- 左侧边栏 -->
+    <aside class="sidebar-left">
+      <div class="sidebar-section">
+        <h3 class="sidebar-title">热门话题</h3>
+        <div class="trending-item">
+          <div class="trending-topic" onclick="navigateToPage('表白.html')">
+
+            <i></i># 全国统一大市场</div>
+            
+          <div class="trending-count">18.5万讨论</div>
+        </div>
+        <div class="trending-item">
+          <div class="trending-topic"># 2025年放假安排</div>
+          <div class="trending-count">15.2万讨论</div>
+        </div>
+        <div class="trending-item">
+          <div class="trending-topic"># 新能源车补贴政策</div>
+          <div class="trending-count">12.8万讨论</div>
+        </div>
+        <div class="trending-item">
+          <div class="trending-topic"># 数字经济新机遇</div>
+          <div class="trending-count">9.7万讨论</div>
+        </div>
+      </div>
+      
+      <div class="sidebar-section">
+        <h3 class="sidebar-title">热门用户</h3>
+        <div class="user-item">
+          <div class="user-info">
+            <img src="https://picsum.photos/40/40?random=10" alt="科技前沿观察头像" class="user-avatar">
+            <div>
+              <div class="user-name">科技前沿观察</div>
+              <div class="user-handle">@tech_observer</div>
+            </div>
+          </div>
+        </div>
+        <div class="user-item">
+          <div class="user-info">
+            <img src="https://picsum.photos/40/40?random=11" alt="生活美学指南头像" class="user-avatar">
+            <div>
+              <div class="user-name">生活美学指南</div>
+              <div class="user-handle">@life_aesthetics</div>
+            </div>
+          </div>
+        </div>
+        <div class="user-item">
+          <div class="user-info">
+            <img src="https://picsum.photos/40/40?random=12" alt="财经资讯速递头像" class="user-avatar">
+            <div>
+              <div class="user-name">财经资讯速递</div>
+              <div class="user-handle">@finance_news</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+    
+    <!-- 中间主内容区 -->
+    <main class="main-content">
+      <!-- 发布微博区域 -->
+      <div class="publish-section">
+        <div class="publish-header">
+          <img src="https://picsum.photos/40/40?random=1" alt="当前用户头像" class="user-avatar" id="current-user-avatar" style="display: none;">
+          <div class="publish-input-container">
+            <textarea id="weibo-content" placeholder="有什么新鲜事想告诉大家？"></textarea>
+            <div class="publish-actions">
+              <div class="action-buttons">
+                <button id="image-upload-btn" class="action-btn">
+                  <i class="fas fa-image"></i>
+                  <span>图片</span>
+                </button>
+                <button class="action-btn" id="emoji-btn">
+                  <i class="fas fa-smile"></i>
+                  <span>表情</span>
+                </button>
+                <button class="action-btn" id="mention-btn">
+                  <i class="fas fa-at"></i>
+                  <span>@</span>
+                </button>
+                <button class="action-btn" id="topic-btn">
+                  <i class="fas fa-hashtag"></i>
+                  <span>话题</span>
+                </button>
+              </div>
+              <button id="publish-btn" class="publish-button" disabled>发布</button>
+              <input type="file" id="image-input" accept="image/*" multiple style="display: none;">
+            </div>
+          </div>
+        </div>
+        <!-- 图片预览区域 -->
+        <div id="image-preview" class="image-preview"></div>
+        <!-- Emoji选择器 -->
+        <div id="emoji-picker" class="emoji-picker" style="display: none;">
+          <div class="emoji-category">
+            <span>常用</span>
+            <div class="emoji-list">
+              <span class="emoji">😀</span>
+              <span class="emoji">😂</span>
+              <span class="emoji">😍</span>
+              <span class="emoji">🥰</span>
+              <span class="emoji">😎</span>
+              <span class="emoji">👍</span>
+              <span class="emoji">❤️</span>
+              <span class="emoji">🙏</span>
+              <span class="emoji">🔥</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 微博内容展示区域 -->
+      <div id="weibo-container" class="weibo-container"></div>
+    </main>
+    
+    <!-- 右侧边栏（新增） -->
+    <aside class="sidebar-right">
+      <!-- 右侧内容1：推荐关注 -->
+      <div class="sidebar-section">
+        <h3 class="sidebar-title" id="mytext" >推荐关注</h3>
+        <div class="user-item">
+          <div class="user-info">
+            <img src="https://picsum.photos/40/40?random=20" alt="美食达人头像" class="user-avatar">
+            <div>
+              <div class="user-name">美食达人阿木</div>
+              <div class="user-handle">@food_amu</div>
+            </div>
+            <button class="btn btn-primary btn-follow">关注</button>
+          </div>
+        </div>
+        <div class="user-item">
+          <div class="user-info">
+            <img src="https://picsum.photos/40/40?random=21" alt="旅行日记头像" class="user-avatar">
+            <div>
+              <div class="user-name">旅行日记</div>
+              <div class="user-handle">@travel_daily</div>
+            </div>
+            <button class="btn btn-primary btn-follow">关注</button>
+          </div>
+        </div>
+        <div class="user-item">
+          <div class="user-info">
+            <img src="https://picsum.photos/40/40?random=22" alt="健身教练头像" class="user-avatar">
+            <div>
+              <div class="user-name">健身教练Mike</div>
+              <div class="user-handle">@fitness_mike</div>
+            </div>
+            <button class="btn btn-primary btn-follow">关注</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 右侧内容2：热门活动 -->
+      <div class="sidebar-section">
+        <h3 class="sidebar-title">热门活动</h3>
+        <div class="trending-item">
+          <div class="trending-topic"># 秋日摄影大赛</div>
+          <div class="trending-count">5.3万参与</div>
+        </div>
+        <div class="trending-item">
+          <div class="trending-topic"># 好书分享季</div>
+          <div class="trending-count">3.8万参与</div>
+        </div>
+        <div class="trending-item">
+          <div class="trending-topic"># 城市马拉松</div>
+          <div class="trending-count">2.1万参与</div>
+        </div>
+      </div>
+      
+      <!-- 右侧内容3：微博小秘书 -->
+      <div class="sidebar-section">
+        <h3 class="sidebar-title">微博小秘书</h3>
+        <div style="padding: 10px; background-color: #f5f8fa; border-radius: 10px;">
+          <p style="font-size: 14px;">完成实名认证，解锁更多功能</p>
+          <button class="btn btn-outline" style="margin-top: 10px; width: 100%;">去认证</button>
+        </div>
+      </div>
+    </aside>
   </div>
   
-  <!-- 底部导航（仅移动端显示） -->
-  <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around py-2 z-40">
-    <a href="#" class="flex flex-col items-center text-primary">
-      <i class="fa fa-home text-xl"></i>
-      <span class="text-xs mt-1">首页</span>
-    </a>
-    <a href="#" class="flex flex-col items-center text-secondary">
-      <i class="fa fa-compass text-xl"></i>
-      <span class="text-xs mt-1">发现</span>
-    </a>
-    <a href="#" class="flex flex-col items-center">
-      <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white -mt-5 shadow-lg">
-        <i class="fa fa-plus text-xl"></i>
+  <!-- 页脚 -->
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="#" class="footer-link">关于微博</a>
+      <a href="#" class="footer-link">微博客服</a>
+      <a href="#" class="footer-link">微博招聘</a>
+      <a href="#" class="footer-link">投诉建议</a>
+      <a href="#" class="footer-link">认证与合作</a>
+      <a href="#" class="footer-link">开放平台</a>
+      <a href="#" class="footer-link">隐私政策</a>
+    </div>
+    <div class="copyright">© 2025 微博 京ICP备12002058号</div>
+  </footer>
+  
+  <!-- 登录模态框 -->
+  <div id="login-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>登录微博</h3>
+        <button id="close-login-modal" class="close-btn">&times;</button>
       </div>
-    </a>
-    <a href="#" class="flex flex-col items-center text-secondary">
-      <i class="fa fa-bell-o text-xl"></i>
-      <span class="text-xs mt-1">通知</span>
-    </a>
-    <a href="#" class="flex flex-col items-center text-secondary">
-      <i class="fa fa-user-o text-xl"></i>
-      <span class="text-xs mt-1">我的</span>
-    </a>
-  </nav>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">用户名/手机号/邮箱</label>
+          <input type="text" class="form-input" id="login-username">
+        </div>
+        <div class="form-group">
+          <label class="form-label">密码</label>
+          <input type="password" class="form-input" id="login-password">
+        </div>
+        <button id="submit-logon" class="btn btn-primary" style="width: 100%;">登录</button>
+        <div class="form-switch">
+          <span>还没有账号？</span>
+          <a href="#" class="form-link" id="switch-to-register">立即注册</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 注册模态框 -->
+  <div id="register-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>注册微博</h3>
+        <button id="close-register-modal" class="close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">手机号</label>
+          <input type="tel" class="form-input" id="register-phone">
+        </div>
+        <div class="form-group">
+          <label class="form-label">密码</label>
+          <input type="password" class="form-input" id="register-password">
+        </div>
+        <div class="form-group">
+          <label class="form-label">确认密码</label>
+          <input type="password" class="form-input" id="register-password-confirm">
+        </div>
+        <button id="submit-register" class="btn btn-primary" style="width: 100%;">注册</button>
+        <div class="form-switch">
+          <span>已有账号？</span>
+          <a href="#" class="form-link" id="switch-to-logon">立即登录</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 评论模态框 -->
+  <div id="comment-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>发表评论</h3>
+        <button id="close-comment-modal" class="close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <textarea id="comment-content" class="form-input" placeholder="写下你的评论..." style="min-height: 100px; resize: vertical;"></textarea>
+        <div class="modal-actions" style="margin-top: 15px; text-align: right;">
+          <button id="submit-comment" class="btn btn-primary">评论</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 设置模态框 -->
+  <div id="settings-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>设置</h3>
+        <button id="close-settings-modal" class="close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">主题</label>
+          <select class="form-input" id="theme-select">
+            <option value="light">浅色</option>
+            <option value="dark">深色</option>
+            <option value="auto">跟随系统</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">通知</label>
+          <div class="checkbox-group">
+            <input type="checkbox" id="notify-comments">
+            <label for="notify-comments">新评论通知</label>
+          </div>
+          <div class="checkbox-group">
+            <input type="checkbox" id="notify-likes">
+            <label for="notify-likes">点赞通知</label>
+          </div>
+        </div>
+        <button id="save-settings" class="btn btn-primary" style="width: 100%;">保存设置</button>
+      </div>
+    </div>
+  </div>
   
   <script>
-    // 导航栏滚动效果
-    const navbar = document.getElementById('navbar');
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 10) {
-        navbar.classList.add('py-2', 'shadow');
-        navbar.classList.remove('py-3', 'shadow-sm');
-      } else {
-        navbar.classList.add('py-3', 'shadow-sm');
-        navbar.classList.remove('py-2', 'shadow');
+    class WeiboApp {
+      constructor() {
+        this.currentWeiboId = null;
+        this.isLoggedIn = false;
+        this.currentUser = null;
+        this.images = [];
+        this.init();
       }
-    });
-    
-    // 图片查看器功能
-    const imageViewer = document.getElementById('image-viewer');
-    const viewerImage = document.getElementById('viewer-image');
-    const closeViewer = document.getElementById('close-viewer');
-    const images = document.querySelectorAll('#weibo-feed img[alt]');
-    
-    images.forEach(img => {
-      // 只对微博内容中的图片添加点击事件
-      if (!img.closest('aside') && !img.closest('header')) {
-        img.addEventListener('click', () => {
-          viewerImage.src = img.src;
-          imageViewer.classList.remove('hidden');
-          document.body.style.overflow = 'hidden'; // 防止背景滚动
-          
-          // 添加淡入动画
-          setTimeout(() => {
-            imageViewer.classList.add('opacity-100');
-          }, 10);
-        });
-      }
-    });
-    
-    function hideViewer() {
-      imageViewer.classList.add('hidden');
-      document.body.style.overflow = ''; // 恢复滚动
-    }
-    
-    closeViewer.addEventListener('click', hideViewer);
-    imageViewer.addEventListener('click', (e) => {
-      if (e.target === imageViewer) {
-        hideViewer();
-      }
-    });
-    
-    // 加载更多微博
-    const loadMoreBtn = document.getElementById('load-more');
-    const weiboFeed = document.getElementById('weibo-feed');
-    
-    loadMoreBtn.addEventListener('click', () => {
-      // 显示加载状态
-      loadMoreBtn.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i><span>加载中...</span>';
       
-      // 模拟加载延迟
-      setTimeout(() => {
-        // 创建新的微博内容
-        const newWeibo = document.createElement('article');
-        newWeibo.className = 'bg-white rounded-xl shadow-sm p-4 card-hover opacity-0 transform translate-y-4 transition-all duration-500';
-        newWeibo.innerHTML = `
-          <div class="flex space-x-3">
-            <img src="https://picsum.photos/200/200?random=${Math.floor(Math.random() * 100)}" alt="用户头像" class="w-10 h-10 rounded-full object-cover">
-            <div class="flex-grow">
-              <div class="flex items-center justify-between">
-                <div>
-                  <h3 class="font-medium">新用户${Math.floor(Math.random() * 1000)}</h3>
-                  <p class="text-secondary text-sm">@newuser${Math.floor(Math.random() * 10000)} · 刚刚</p>
-                </div>
-                <button class="text-secondary hover:text-dark transition-colors">
-                  <i class="fa fa-ellipsis-h"></i>
-                </button>
-              </div>
-              
-              <div class="mt-2">
-                <p>这是一条新加载的微博内容，展示了动态加载功能。使用JavaScript可以实现无限滚动效果，提升用户体验。#动态加载# #前端开发#</p>
-                
-                <div class="mt-3 rounded-xl overflow-hidden cursor-pointer group">
-                  <img src="https://picsum.photos/800/500?random=${Math.floor(Math.random() * 1000)}" alt="微博图片" 
-                       class="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105">
-                </div>
-              </div>
-              
-              <div class="mt-3 flex justify-between text-secondary">
-                <button class="flex items-center space-x-1 hover:text-primary transition-colors p-2 rounded-full hover:bg-primary/10">
-                  <i class="fa fa-comment-o"></i>
-                  <span>${Math.floor(Math.random() * 100)}</span>
-                </button>
-                <button class="flex items-center space-x-1 hover:text-green-500 transition-colors p-2 rounded-full hover:bg-green-500/10">
-                  <i class="fa fa-retweet"></i>
-                  <span>${Math.floor(Math.random() * 50)}</span>
-                </button>
-                <button class="flex items-center space-x-1 hover:text-red-500 transition-colors p-2 rounded-full hover:bg-red-500/10">
-                  <i class="fa fa-heart-o"></i>
-                  <span>${Math.floor(Math.random() * 200)}</span>
-                </button>
-                <button class="flex items-center space-x-1 hover:text-primary transition-colors p-2 rounded-full hover:bg-primary/10">
-                  <i class="fa fa-share"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        `;
+      init() {
+        this.bindEvents();
+        this.loadWeibos();
+        this.checkLoginStatus();
+        this.loadSettings();
+      }
+      
+      bindEvents() {
+        // 发布微博按钮事件
+        document.getElementById('publish-btn').addEventListener('click', () => this.publishWeibo());
         
-        // 添加到列表并触发动画
-        weiboFeed.appendChild(newWeibo);
-        setTimeout(() => {
-          newWeibo.classList.remove('opacity-0', 'translate-y-4');
-        }, 10);
+        // 微博内容输入监听
+        document.getElementById('weibo-content').addEventListener('input', (e) => {
+          const publishBtn = document.getElementById('publish-btn');
+          publishBtn.disabled = e.target.value.trim().length === 0;
+        });
         
-        // 恢复按钮状态
-        loadMoreBtn.innerHTML = '<span>加载更多</span><i class="fa fa-refresh ml-2"></i>';
+        // 图片上传按钮事件
+        document.getElementById('image-upload-btn').addEventListener('click', () => {
+          document.getElementById('image-input').click();
+        });
         
-        // 为新添加的图片绑定点击事件
-        const newImages = newWeibo.querySelectorAll('img');
-        newImages.forEach(img => {
-          img.addEventListener('click', () => {
-            viewerImage.src = img.src;
-            imageViewer.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
+        // 图片选择事件
+        document.getElementById('image-input').addEventListener('change', (e) => this.handleImageSelect(e));
+        
+        // 表情按钮事件
+        document.getElementById('emoji-btn').addEventListener('click', () => this.toggleEmojiPicker());
+        
+        // 话题按钮事件
+        document.getElementById('topic-btn').addEventListener('click', () => this.insertTopic());
+        
+        // @按钮事件
+        document.getElementById('mention-btn').addEventListener('click', () => this.insertMention());
+        
+        // 搜索功能
+        document.getElementById('search-input').addEventListener('input', (e) => this.handleSearch(e.target.value));
+        
+        // 登录注册按钮事件
+        document.getElementById('login-btn').addEventListener('click', () => this.showLoginModal());
+        document.getElementById('register-btn').addEventListener('click', () => this.showRegisterModal());
+        
+        // 模态框关闭事件
+        document.getElementById('close-login-modal').addEventListener('click', () => this.closeLoginModal());
+        document.getElementById('close-register-modal').addEventListener('click', () => this.closeRegisterModal());
+        document.getElementById('close-comment-modal').addEventListener('click', () => this.closeCommentModal());
+        document.getElementById('close-settings-modal').addEventListener('click', () => this.closeSettingsModal());
+        
+        // 登录注册切换
+        document.getElementById('switch-to-register').addEventListener('click', (e) => {
+          e.preventDefault();
+          this.closeLoginModal();
+          this.showRegisterModal();
+        });
+        
+        document.getElementById('switch-to-logon').addEventListener('click', (e) => {
+          e.preventDefault();
+          this.closeRegisterModal();
+          this.showLoginModal();
+        });
+        
+        // 提交登录注册
+        document.getElementById('submit-logon').addEventListener('click', () => this.submitLogin());
+        document.getElementById('submit-register').addEventListener('click', () => this.submitRegister());
+        document.getElementById('submit-comment').addEventListener('click', () => this.submitComment());
+        document.getElementById('save-settings').addEventListener('click', () => this.saveSettings());
+        
+        // 点击模态框外部关闭
+        window.addEventListener('click', (e) => {
+          if (e.target.classList.contains('modal')) {
+            this.closeLoginModal();
+            this.closeRegisterModal();
+            this.closeCommentModal();
+            this.closeSettingsModal();
+          }
+        });
+        
+        // 键盘快捷键
+        document.addEventListener('keydown', (e) => {
+          if (e.ctrlKey && e.key === 'Enter') {
+            this.publishWeibo();
+          }
+          
+          if (e.key === 'Escape') {
+            this.closeLoginModal();
+            this.closeRegisterModal();
+            this.closeCommentModal();
+            this.closeSettingsModal();
+          }
+        });
+        
+        // Emoji点击事件
+        document.querySelectorAll('.emoji').forEach(emoji => {
+          emoji.addEventListener('click', () => this.insertEmoji(emoji.textContent));
+        });
+
+        // 右侧关注按钮事件（新增）
+        document.querySelectorAll('.btn-follow').forEach(btn => {
+          btn.addEventListener('click', function() {
+            if (this.textContent === '关注') {
+              this.textContent = '已关注';
+              this.classList.remove('btn-primary');
+              this.classList.add('btn-outline');
+              weiboApp.showNotification('关注成功！', 'success');
+            } else {
+              this.textContent = '关注';
+              this.classList.remove('btn-outline');
+              this.classList.add('btn-primary');
+              weiboApp.showNotification('已取消关注', 'info');
+            }
           });
         });
-      }, 1500);
-    });
-    
-    // 点赞、转发、评论按钮动画效果
-    const interactionBtns = document.querySelectorAll('#weibo-feed button');
-    interactionBtns.forEach(btn => {
-      btn.addEventListener('click', function() {
-        // 点赞按钮特殊处理
-        if (this.querySelector('.fa-heart-o')) {
-          this.querySelector('i').classList.remove('fa-heart-o');
-          this.querySelector('i').classList.add('fa-heart');
-          this.classList.add('text-red-500');
+      }
+      
+      checkLoginStatus() {
+        const savedUser = localStorage.getItem('currentUser');
+        if (savedUser) {
+          this.currentUser = JSON.parse(savedUser);
+          this.isLoggedIn = true;
+          this.updateUIAfterLogin();
+        }
+      }
+      
+      handleImageSelect(event) {
+        const files = event.target.files;
+        const previewContainer = document.getElementById('image-preview');
+        
+        Array.from(files).forEach(file => {
+          if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              const previewItem = document.createElement('div');
+              previewItem.className = 'preview-item';
+              
+              const img = document.createElement('img');
+              img.src = e.target.result;
+              img.alt = '选择的图片预览';
+              
+              const removeBtn = document.createElement('button');
+              removeBtn.className = 'remove-image';
+              removeBtn.innerHTML = '×';
+              removeBtn.addEventListener('click', () => {
+                previewItem.remove();
+              });
+              
+              previewItem.appendChild(img);
+              previewItem.appendChild(removeBtn);
+              previewContainer.appendChild(previewItem);
+              
+              this.images.push(e.target.result);
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+        
+        event.target.value = '';
+      }
+      
+      toggleEmojiPicker() {
+        const emojiPicker = document.getElementById('emoji-picker');
+        emojiPicker.style.display = emojiPicker.style.display === 'none' ? 'block' : 'none';
+      }
+      
+      insertEmoji(emoji) {
+        const textarea = document.getElementById('weibo-content');
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const text = textarea.value;
+        const before = text.substring(0, start);
+        const after = text.substring(end, text.length);
+        
+        textarea.value = before + emoji + after;
+        textarea.focus();
+        textarea.selectionStart = textarea.selectionEnd = start + emoji.length;
+        
+        document.getElementById('emoji-picker').style.display = 'none';
+      }
+      
+      insertTopic() {
+        const textarea = document.getElementById('weibo-content');
+        const topic = prompt('请输入话题名称：');
+        if (topic) {
+          const start = textarea.selectionStart;
+          const end = textarea.selectionEnd;
+          const text = textarea.value;
+          const before = text.substring(0, start);
+          const after = text.substring(end, text.length);
           
-          // 更新数字
-          const countSpan = this.querySelector('span');
-          if (countSpan) {
-            countSpan.textContent = parseInt(countSpan.textContent) + 1;
+          textarea.value = before + `#${topic}# ` + after;
+          textarea.focus();
+        }
+      }
+      
+      insertMention() {
+        const textarea = document.getElementById('weibo-content');
+        const user = prompt('请输入要@的用户名：');
+        if (user) {
+          const start = textarea.selectionStart;
+          const end = textarea.selectionEnd;
+          const text = textarea.value;
+          const before = text.substring(0, start);
+          const after = text.substring(end, text.length);
+          
+          textarea.value = before + `@${user} ` + after;
+          textarea.focus();
+        }
+      }
+      
+      handleSearch(query) {
+        const weibos = this.getWeibos();
+        const container = document.getElementById('weibo-container');
+        
+        if (!query.trim()) {
+          container.innerHTML = '';
+          weibos.forEach(weibo => this.renderWeibo(weibo));
+          return;
+        }
+        
+        const filteredWeibos = weibos.filter(weibo => 
+          weibo.content.toLowerCase().includes(query.toLowerCase()) ||
+          weibo.username.toLowerCase().includes(query.toLowerCase())
+        );
+        
+        container.innerHTML = '';
+        filteredWeibos.forEach(weibo => this.renderWeibo(weibo));
+      }
+      
+      publishWeibo() {
+        if (!this.isLoggedIn) {
+          this.showNotification('请先登录后再发布微博', 'warning');
+          this.showLoginModal();
+          return;
+        }
+        
+        const content = document.getElementById('weibo-content').value.trim();
+        if (!content) return;
+        
+        const previewContainer = document.getElementById('image-preview');
+        const imageElements = previewContainer.querySelectorAll('img');
+        const images = Array.from(imageElements).map(img => img.src);
+        
+        const weibo = {
+          id: Date.now(),
+          username: this.currentUser.username,
+          content: content,
+          images: images,
+          likes: 0,
+          reposts: 0,
+          comments: [],
+          timestamp: new Date().toISOString(),
+          liked: false,
+          reposted: false
+        };
+        
+        this.saveWeibo(weibo);
+        this.renderWeibo(weibo);
+        
+        // 清空输入框和图片预览
+        document.getElementById('weibo-content').value = '';
+        document.getElementById('publish-btn').disabled = true;
+        previewContainer.innerHTML = '';
+        this.images = [];
+        
+        this.showNotification('微博发布成功！', 'success');
+      }
+      
+      showLoginModal() {
+        document.getElementById('login-modal').style.display = 'flex';
+      }
+      
+      closeLoginModal() {
+        document.getElementById('login-modal').style.display = 'none';
+        document.getElementById('login-username').value = '';
+        document.getElementById('login-password').value = '';
+      }
+      
+      showRegisterModal() {
+        document.getElementById('register-modal').style.display = 'flex';
+      }
+      
+      closeRegisterModal() {
+        document.getElementById('register-modal').style.display = 'none';
+        document.getElementById('register-phone').value = '';
+        document.getElementById('register-password').value = '';
+        document.getElementById('register-password-confirm').value = '';
+      }
+      
+      showCommentModal(weiboId) {
+        this.currentWeiboId = weiboId;
+        document.getElementById('comment-modal').style.display = 'flex';
+      }
+      
+      closeCommentModal() {
+        document.getElementById('comment-modal').style.display = 'none';
+        document.getElementById('comment-content').value = '';
+      }
+      
+      showSettingsModal() {
+        document.getElementById('settings-modal').style.display = 'flex';
+      }
+      
+      closeSettingsModal() {
+        document.getElementById('settings-modal').style.display = 'none';
+      }
+      
+      submitLogin() {
+        const username = document.getElementById('login-username').value.trim();
+        const password = document.getElementById('login-password').value.trim();
+        
+        if (!username || !password) {
+          this.showNotification('请输入用户名和密码', 'warning');
+          return;
+        }
+        
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const user = users.find(u => 
+          (u.username === username || u.phone === username) && u.password === password
+        );
+        
+        if (user) {
+          this.currentUser = user;
+          this.isLoggedIn = true;
+          localStorage.setItem('currentUser', JSON.stringify(user));
+          this.updateUIAfterLogin();
+          this.closeLoginModal();
+          this.showNotification('登录成功！', 'success');
+        } else {
+          this.showNotification('用户名或密码错误', 'error');
+        }
+      }
+      
+      submitRegister() {
+        const phone = document.getElementById('register-phone').value.trim();
+        const password = document.getElementById('register-password').value.trim();
+        const passwordConfirm = document.getElementById('register-password-confirm').value.trim();
+        
+        if (!phone) {
+          this.showNotification('请输入手机号', 'warning');
+          return;
+        }
+        
+        if (password !== passwordConfirm) {
+          this.showNotification('两次输入的密码不一致', 'warning');
+          return;
+        }
+        
+        if (password.length < 6) {
+          this.showNotification('密码长度不能少于6位', 'warning');
+          return;
+        }
+        
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        
+        // 检查手机号是否已注册
+        if (users.find(u => u.phone === phone)) {
+          this.showNotification('该手机号已注册', 'warning');
+          return;
+        }
+        
+        const newUser = {
+          id: Date.now(),
+          username: '用户' + Math.random().toString(36).substr(2, 6),
+          phone: phone,
+          password: password,
+          avatar: `https://picsum.photos/40/40?random=${Date.now()}`,
+          joinDate: new Date().toISOString()
+        };
+        
+        users.push(newUser);
+        localStorage.setItem('users', JSON.stringify(users));
+        
+        this.showNotification('注册成功！请登录', 'success');
+        this.closeRegisterModal();
+        this.showLoginModal();
+      }
+      
+      submitComment() {
+        if (!this.isLoggedIn) {
+          this.showNotification('请先登录后再评论', 'warning');
+          this.closeCommentModal();
+          this.showLoginModal();
+          return;
+        }
+        
+        const content = document.getElementById('comment-content').value.trim();
+        if (!content) {
+          this.showNotification('请输入评论内容', 'warning');
+          return;
+        }
+        
+        const comment = {
+          id: Date.now(),
+          username: this.currentUser.username,
+          content: content,
+          timestamp: new Date().toISOString()
+        };
+        
+        const weibos = this.getWeibos();
+        const weiboIndex = weibos.findIndex(w => w.id === this.currentWeiboId);
+        
+        if (weiboIndex !== -1) {
+          weibos[weiboIndex].comments.push(comment);
+          localStorage.setItem('weibos', JSON.stringify(weibos));
+          
+          this.closeCommentModal();
+          this.loadWeibos();
+          this.showNotification('评论发布成功！', 'success');
+        }
+      }
+      
+      saveSettings() {
+        const theme = document.getElementById('theme-select').value;
+        const notifyComments = document.getElementById('notify-comments').checked;
+        const notifyLikes = document.getElementById('notify-likes').checked;
+        
+        const settings = {
+          theme: theme,
+          notifyComments: notifyComments,
+          notifyLikes: notifyLikes
+        };
+        
+        localStorage.setItem('settings', JSON.stringify(settings));
+        this.applyTheme(theme);
+        this.closeSettingsModal();
+        this.showNotification('设置保存成功！', 'success');
+      }
+      
+      loadSettings() {
+        const savedSettings = localStorage.getItem('settings');
+        if (savedSettings) {
+          const settings = JSON.parse(savedSettings);
+          document.getElementById('theme-select').value = settings.theme;
+          document.getElementById('notify-comments').checked = settings.notifyComments;
+          document.getElementById('notify-likes').checked = settings.notifyLikes;
+          this.applyTheme(settings.theme);
+        }
+      }
+      
+      applyTheme(theme) {
+        if (theme === 'dark' || (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.body.classList.add('dark-theme');
+        } else {
+          document.body.classList.remove('dark-theme');
+        }
+      }
+      
+      updateUIAfterLogin() {
+        const navUser = document.getElementById('nav-user');
+        const currentUserAvatar = document.getElementById('current-user-avatar');
+        
+        navUser.innerHTML = `
+            <img src="${this.currentUser.avatar}" alt="${this.currentUser.username}" class="user-avatar">
+            <span>${this.currentUser.username}</span>
+            <button id="settings-btn" class="btn btn-outline">设置</button>
+            <button id="logout-btn" class="btn btn-outline">退出</button>
+        `;
+        
+        currentUserAvatar.style.display = 'block';
+        currentUserAvatar.src = this.currentUser.avatar;
+        currentUserAvatar.alt = this.currentUser.username;
+        
+        document.getElementById('settings-btn').addEventListener('click', () => this.showSettingsModal());
+        document.getElementById('logout-btn').addEventListener('click', () => this.logout());
+      }
+      
+      logout() {
+        this.isLoggedIn = false;
+        this.currentUser = null;
+        localStorage.removeItem('currentUser');
+        
+        const navUser = document.getElementById('nav-user');
+        navUser.innerHTML = `
+            <button id="login-btn" class="btn btn-outline">登录</button>
+            <button id="register-btn" class="btn btn-primary">注册</button>
+        `;
+        
+        document.getElementById('current-user-avatar').style.display = 'none';
+        
+        this.showNotification('已退出登录', 'info');
+        
+        // 重新绑定登录注册按钮事件
+        document.getElementById('login-btn').addEventListener('click', () => this.showLoginModal());
+        document.getElementById('register-btn').addEventListener('click', () => this.showRegisterModal());
+      }
+      
+      getWeibos() {
+        return JSON.parse(localStorage.getItem('weibos') || '[]');
+      }
+      
+      saveWeibo(weibo) {
+        const weibos = this.getWeibos();
+        weibos.unshift(weibo);
+        localStorage.setItem('weibos', JSON.stringify(weibos));
+      }
+      
+      loadWeibos() {
+        const weibos = this.getWeibos();
+        const container = document.getElementById('weibo-container');
+        container.innerHTML = '';
+        
+        if (weibos.length === 0) {
+          this.loadSampleWeibos();
+          return;
+        }
+        
+        weibos.forEach(weibo => this.renderWeibo(weibo));
+      }
+      
+      loadSampleWeibos() {
+        const sampleWeibos = [
+          {
+            id: 1,
+            username: '科技前沿观察',
+            content: '人工智能技术正在快速发展，特别是在自然语言处理领域。最新的模型已经能够理解和生成接近人类水平的文本内容。',
+            images: ['https://picsum.photos/300/200?random=1'],
+            likes: 245,
+            reposts: 67,
+            comments: [
+              {
+                id: 101,
+                username: '开发者小王',
+                content: '确实，现在AI的发展速度令人惊叹！',
+                timestamp: '2025-11-03T10:30:00Z'
+              }
+            ],
+            timestamp: '2025-11-04T08:15:00Z',
+            liked: false,
+            reposted: false
+          },
+          {
+            id: 2,
+            username: '生活美学指南',
+            content: '周末去了一趟郊外的森林公园，秋天的景色真的很美。分享几张随手拍的照片给大家～',
+            images: [
+              'https://picsum.photos/300/200?random=2',
+              'https://picsum.photos/300/200?random=3',
+              'https://picsum.photos/300/200?random=4'
+            ],
+            likes: 189,
+            reposts: 34,
+            comments: [],
+            timestamp: '2025-11-03T14:20:00Z',
+            liked: false,
+            reposted: false
+          },
+          {
+            id: 3,
+            username: '财经资讯速递',
+            content: '数字经济正在成为推动经济增长的重要引擎。据最新数据显示，今年前三季度数字经济规模同比增长超过15%。',
+            images: [],
+            likes: 156,
+            reposts: 28,
+            comments: [
+              {
+                id: 301,
+                username: '投资分析师',
+                content: '这个增长趋势确实很明显，特别是在线教育、远程办公等领域。',
+                timestamp: '2025-11-02T16:45:00Z'
+              }
+            ],
+            timestamp: '2025-11-02T15:30:00Z',
+            liked: false,
+            reposted: false
+          }
+        ];
+        
+        localStorage.setItem('weibos', JSON.stringify(sampleWeibos));
+        sampleWeibos.forEach(weibo => this.renderWeibo(weibo));
+      }
+      
+      renderWeibo(weibo) {
+        const container = document.getElementById('weibo-container');
+        
+        const weiboElement = document.createElement('div');
+        weiboElement.className = 'weibo-item';
+        weiboElement.innerHTML = `
+            <div class="weibo-header">
+                <img src="https://picsum.photos/40/40?random=${weibo.id}" class="user-avatar">
+                <div class="weibo-user-info">
+                    <div class="weibo-username">${weibo.username}</div>
+                    <div class="weibo-time">${this.formatTime(weibo.timestamp)}</div>
+                </div>
+            </div>
+            <div class="weibo-content">${weibo.content}</div>
+            ${weibo.images && weibo.images.length > 0 ? `
+                <div class="weibo-images">
+                    ${weibo.images.map(img => `
+                        <img src="${img}" alt="微博图片" class="weibo-image">
+                    `).join('')}
+                </div>
+            ` : ''}
+            <div class="weibo-actions">
+                <button class="action-count ${weibo.liked ? 'liked' : ''}" onclick="weiboApp.handleLike(${weibo.id})">
+                    <i class="fas fa-heart"></i>
+                    <span>${weibo.likes}</span>
+                </button>
+                <button class="action-count ${weibo.reposted ? 'liked' : ''}" onclick="weiboApp.handleRepost(${weibo.id})">
+                    <i class="fas fa-retweet"></i>
+                    <span>${weibo.reposts}</span>
+                </button>
+                <button class="action-count" onclick="weiboApp.showCommentModal(${weibo.id})">
+                    <i class="fas fa-comment"></i>
+                    <span>${weibo.comments.length}</span>
+                </button>
+            </div>
+            ${weibo.comments && weibo.comments.length > 0 ? `
+                <div class="comments-section">
+                    ${weibo.comments.map(comment => `
+                        <div class="comment-item">
+                            <img src="https://picsum.photos/30/30?random=${comment.id}" class="user-avatar">
+                            <div class="comment-content">
+                                <div class="comment-username">${comment.username}</div>
+                                <div class="comment-text">${comment.content}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            ` : ''}
+        `;
+        
+        container.appendChild(weiboElement);
+      }
+      
+      handleLike(weiboId) {
+        if (!this.isLoggedIn) {
+          this.showNotification('请先登录后再点赞', 'warning');
+          this.showLoginModal();
+          return;
+        }
+        
+        const weibos = this.getWeibos();
+        const weiboIndex = weibos.findIndex(w => w.id === weiboId);
+        
+        if (weiboIndex !== -1) {
+          if (weibos[weiboIndex].liked) {
+            weibos[weiboIndex].likes--;
+            weibos[weiboIndex].liked = false;
+          } else {
+            weibos[weiboIndex].likes++;
+            weibos[weiboIndex].liked = true;
           }
           
-          // 添加点赞动画
-          const heart = document.createElement('span');
-          heart.innerHTML = '<i class="fa fa-heart text-red-500"></i>';
-          heart.className = 'absolute text-2xl opacity-0 transform scale-0';
-          this.appendChild(heart);
-          
-          setTimeout(() => {
-            heart.classList.add('transition-all', 'duration-500', 'opacity-100', 'scale-150', 'translate-y-[-20px]');
-          }, 10);
-          
-          setTimeout(() => {
-            heart.remove();
-          }, 600);
+          localStorage.setItem('weibos', JSON.stringify(weibos));
+          this.loadWeibos();
         }
-        // 转发按钮处理
-        else if (this.querySelector('.fa-retweet')) {
-          this.classList.add('text-green-500');
-          
-          // 更新数字
-          const countSpan = this.querySelector('span');
-          if (countSpan) {
-            countSpan.textContent = parseInt(countSpan.textContent) + 1;
+      }
+      
+      handleRepost(weiboId) {
+        if (!this.isLoggedIn) {
+          this.showNotification('请先登录后再转发', 'warning');
+          this.showLoginModal();
+          return;
+        }
+        
+        const weibos = this.getWeibos();
+        const weiboIndex = weibos.findIndex(w => w.id === weiboId);
+        
+        if (weiboIndex !== -1) {
+          if (weibos[weiboIndex].reposted) {
+            weibos[weiboIndex].reposts--;
+            weibos[weiboIndex].reposted = false;
+          } else {
+            weibos[weiboIndex].reposts++;
+            weibos[weiboIndex].reposted = true;
           }
+          
+          localStorage.setItem('weibos', JSON.stringify(weibos));
+          this.loadWeibos();
         }
-      });
-    });
+      }
+      
+      formatTime(timestamp) {
+        const now = new Date();
+        const time = new Date(timestamp);
+        const diff = now - time;
+        
+        if (diff < 60000) { // 1分钟内
+          return '刚刚';
+        } else if (diff < 3600000) { // 1小时内
+          return `${Math.floor(diff / 60000)}分钟前`;
+        } else if (diff < 86400000) { // 1天内
+          return `${Math.floor(diff / 3600000)}小时前`;
+        } else if (diff < 604800000) { // 1周内
+          return `${Math.floor(diff / 86400000)}天前`;
+        } else {
+          return time.toLocaleDateString('zh-CN');
+        }
+      }
+      
+      showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.textContent = message;
+        notification.style.backgroundColor = 
+          type === 'success' ? '#10b981' : 
+          type === 'warning' ? '#f59e0b' :
+          type === 'error' ? '#ef4444' : '#1da1f2';
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+          notification.remove();
+        }, 3000);
+      }
+    }
+
+    // 初始化应用
+    const weiboApp = new WeiboApp();
+
+    // 全局函数供HTML调用
+    window.weiboApp = weiboApp;
   </script>
 </body>
 </html>
+<script>
+ // JavaScript跳转函数
+        function navigateToPage(pageUrl) {
+            window.location.href = pageUrl;
+        }
+
+        // 带确认的跳转函数
+        function confirmNavigation() {
+            if (confirm('确定要跳转到全国统一大市场页面吗？')) {
+                window.location.href = '表白.html';
+            }
+        }
+</script>
 
 		

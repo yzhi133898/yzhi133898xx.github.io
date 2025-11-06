@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<link rel="stylesheet" href="css/public.css">
+		<link rel="stylesheet" href="css/style.css">
+	</head>
+    <style>
+        .pic{
+	width: 1300px;
+	height: 800px;
+	box-shadow: 0 0 10px 0 rgba(0,0,1,1);
+	border-radius: 10px;
+	background: url(嫁给我吧jpg.jpg);/*背景图可自行选择添加哦*/
+	margin-left: auto;
+	margin-right: auto;
+    background-size: cover; /* 图片覆盖整个盒子 */
+   background-position: center; /* 图片居中显示 */
+   background-repeat: no-repeat; /* 防止图片重复 */
+}
+.pic img{
+	width: 800px;
+	height: 800px;
+	
+}
+    </style>
+	<body>
+		<div class="pic"  id="box">
+		</div>
+		<script src="js/app.js"></script>
+	</body>
+</html>
+<script>
+    let box=document.getElementById("box");
+let str=" 亲爱的，I LOVE YOU , I AM GOING TO LOVE YOU FOR A LONG TIME WITHOUT THE THOUGHT OF GIVING UP,  WANT TO SAY TOO MUCH TO SAY TO HIM ";
+let arr=str.split("");//这里面写上给自己女神的话
+let i=0;
+box.innerHTML="";
+function typingFun(){
+	box.innerHTML +=arr[i];
+	i++;
+	if(i>=arr.length){
+		clearInterval(myset);
+	}
+}
+let myset=setInterval(typingFun,500);
+</script>
